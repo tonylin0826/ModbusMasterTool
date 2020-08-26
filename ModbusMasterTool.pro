@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    modbus.cpp
+    modbus.cpp \
+    modbussubwindow.cpp
 
 HEADERS += \
     mainwindow.hpp \
-    modbus.hpp
+    modbus.hpp \
+    modbussubwindow.hpp
 
 FORMS += \
     mainwindow.ui

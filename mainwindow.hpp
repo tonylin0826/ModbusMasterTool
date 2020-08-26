@@ -2,6 +2,8 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include <QMdiSubWindow>
+#include <QResizeEvent>
 
 #include "modbus.hpp"
 
@@ -18,12 +20,17 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
+ protected:
+  void resizeEvent(QResizeEvent *event) override;
+
  private slots:
-  void on_pushButton_clicked();
+  void on_mdiArea_subWindowActivated(QMdiSubWindow *arg1);
 
  private:
   Ui::MainWindow *_ui;
   Modbus::ModbusTcp *_modbus;
   bool _modbusConnected;
+
+  void _setupUI();
 };
 #endif  // MAINWINDOW_HPP
