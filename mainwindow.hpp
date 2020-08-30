@@ -21,15 +21,17 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
 
  protected:
-  void resizeEvent(QResizeEvent *event) override;
-
+  bool eventFilter(QObject *object, QEvent *event) override;
  private slots:
   void on_mdiArea_subWindowActivated(QMdiSubWindow *arg1);
+
+  void on_actiontest_triggered();
+
+  void on_btnConnect_clicked();
 
  private:
   Ui::MainWindow *_ui;
   Modbus::ModbusTcp *_modbus;
-  bool _modbusConnected;
 
   void _setupUI();
 };

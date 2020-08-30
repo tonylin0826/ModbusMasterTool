@@ -6,31 +6,92 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
-    <height>465</height>
+    <width>1028</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Modbus Master</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QMdiArea" name="mdiArea">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>130</y>
-      <width>200</width>
-      <height>160</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="inputPort"/>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="inputIp"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnConnect">
+          <property name="text">
+           <string>Connect</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QMdiArea" name="mdiArea">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>698</width>
+     <width>1028</width>
      <height>22</height>
     </rect>
    </property>
@@ -38,17 +99,16 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="separator"/>
+    <addaction name="actiontest"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>22</height>
-    </size>
+  <action name="actiontest">
+   <property name="text">
+    <string>test</string>
    </property>
-  </widget>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -17,6 +17,8 @@
 
 namespace Modbus {
 
+enum RegisterType { Coils = 0, DiscreteInputs, InputRegisters, HoldingRegisters };
+
 enum FunctionCode {
   ReadCoils = 0x01,
   ReadDiscreteInputs = 0x02,
@@ -131,6 +133,8 @@ class ModbusTcp : public QObject {
   }
 
   void disconnect() { _socket->disconnectFromHost(); }
+
+  bool isConnected() { return _socket->state() == QAbstractSocket::SocketState::ConnectedState; }
 
  private slots:
   void _readFromSocket();

@@ -16,18 +16,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    addmodbusregisterdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     modbus.cpp \
     modbussubwindow.cpp
 
 HEADERS += \
+    addmodbusregisterdialog.hpp \
     mainwindow.hpp \
     modbus.hpp \
     modbussubwindow.hpp
 
 FORMS += \
-    mainwindow.ui
+    addmodbusregisterdialog.ui \
+    mainwindow.ui \
+    modbussubwindow.ui
 
 TRANSLATIONS += \
     ModbusMasterTool_en_US.ts
