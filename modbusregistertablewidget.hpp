@@ -66,6 +66,7 @@ class ModbusRegisterTalbleWidgetItem : public QTableWidgetItem {
         setText(QString::number(qFromBigEndian<qint32>(value.data())));
         break;
       case ModbusRegisterDisplayOption::IEEEFloatBE:
+        qDebug() << "asdasd:" << qFromBigEndian<float>(value.data());
         setText(QString::number(qFromBigEndian<float>(value.data())));
         break;
       case ModbusRegisterDisplayOption::IEEEDoubleBE:
@@ -88,7 +89,7 @@ class ModbusRegisterTalbleWidgetItem : public QTableWidgetItem {
         return 2;
       case ModbusRegisterDisplayOption::IEEEDoubleLE:
       case ModbusRegisterDisplayOption::IEEEDoubleBE:
-        return 3;
+        return 4;
       default:
         return 1;
     }

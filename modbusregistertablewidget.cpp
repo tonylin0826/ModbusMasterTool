@@ -16,16 +16,23 @@ void ModbusRegisterTableWidget::updateValues(const QVector<QByteArray> &values) 
     return;
   }
 
-  for (quint16 i = 0; i < rows; i++) {
+  for (quint16 i = 0; i < rows;) {
     const auto tableItem = static_cast<ModbusRegisterTalbleWidgetItem *>(item(i, 1));
     const auto wordSize = tableItem->displayOptionWordSize();
 
     QByteArray b;
     for (quint16 w = 0; w < wordSize && (w + i) < rows; w++) {
       b += values[w + i];
+
+      if (w != 0) {
+        const auto tableItemTmp = static_cast<ModbusRegisterTalbleWidgetItem *>(item(w + i, 1));
+        tableItemTmp->setValue("");
+      }
     }
     qDebug() << "asd:" << b.toHex();
     tableItem->setValue(b);
+
+    i += wordSize;
   }
 }
 

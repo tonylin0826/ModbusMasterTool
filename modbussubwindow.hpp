@@ -34,12 +34,18 @@ class ModbusSubWindow : public QMdiSubWindow {
 
   void updateValues(QVector<QByteArray> values);
 
+ signals:
+  void closed(ModbusSubWindow *windowPtr);
+
  private:
   Ui::ModbusSubWindow *_ui;
 
   ModbusSubWindowOptions _options;
 
   void _setupUi();
+
+ protected:
+  void closeEvent(QCloseEvent *closeEvent) override;
 };
 
 #endif  // MODBUSSUBWINDOW_HPP

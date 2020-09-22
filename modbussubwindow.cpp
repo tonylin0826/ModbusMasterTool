@@ -61,3 +61,8 @@ void ModbusSubWindow::_setupUi() {
 
   _ui->tableWidget->setRegisterRange(_options.address, _options.count);
 }
+
+void ModbusSubWindow::closeEvent(QCloseEvent *closeEvent) {
+  Q_UNUSED(closeEvent);
+  emit closed(this);
+}
