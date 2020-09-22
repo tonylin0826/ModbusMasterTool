@@ -28,6 +28,12 @@ class ModbusSubWindow : public QMdiSubWindow {
 
   ~ModbusSubWindow();
 
+  ModbusSubWindowOptions options();
+
+  void updateOptions(ModbusSubWindowOptions option);
+
+  void updateValues(QVector<QByteArray> values);
+
  private:
   Ui::ModbusSubWindow *_ui;
 

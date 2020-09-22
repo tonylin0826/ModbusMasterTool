@@ -14,18 +14,40 @@
 #include "ui_modbussubwindow.h"
 
 ModbusSubWindow::ModbusSubWindow(QWidget *parent, Modbus::RegisterType type, quint16 address, quint16 count)
-    : QMdiSubWindow(parent),
-      _ui(new Ui::ModbusSubWindow),
-      _options({.type = type, .address = address, .count = count}) {
-  _setupUi();
-}
+    : ModbusSubWindow(parent, {.type = type, .address = address, .count = count}) {}
 
 ModbusSubWindow::ModbusSubWindow(QWidget *parent, ModbusSubWindowOptions options)
     : QMdiSubWindow(parent), _ui(new Ui::ModbusSubWindow), _options(options) {
   _setupUi();
+
+  _ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  qDebug() << "ModbusSubWindow";
+  QObject::connect(_ui->tableWidget, &QTableWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
+    qDebug() << "pos " << pos;
+    QTableWidgetItem *item = _ui->tableWidget->itemAt(pos);
+    if (item) {
+      qDebug() << item->text();
+    }
+  });
 }
 
 ModbusSubWindow::~ModbusSubWindow() { delete _ui; }
+
+ModbusSubWindowOptions ModbusSubWindow::options() { return _options; }
+
+void ModbusSubWindow::updateOptions(ModbusSubWindowOptions option) {
+  Q_UNUSED(option);
+  // TODO: impl
+}
+
+void ModbusSubWindow::updateValues(QVector<QByteArray> values) {
+  if (values.size() != _options.count) {
+    qDebug() << "size not match - " << values.size() << ", " << _options.count;
+    return;
+  }
+
+  _ui->tableWidget->updateValues(values);
+}
 
 void ModbusSubWindow::_setupUi() {
   setAttribute(Qt::WA_DeleteOnClose);
@@ -37,17 +59,5 @@ void ModbusSubWindow::_setupUi() {
   const QString titles[4] = {"Coils", "Discrete Inputs", "Input Registers", "Holding Registers"};
   setWindowTitle(titles[_options.type]);
 
-  _ui->tableWidget->setRowCount(_options.count);
-  _ui->tableWidget->verticalHeader()->hide();
-
-  for (quint16 i = 0; i < _options.count; i++) {
-    auto item = new QTableWidgetItem(QString::number(_options.address + i));
-    auto itemValue = new QTableWidgetItem(QString::number(0));
-    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    itemValue->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    itemValue->setTextAlignment(Qt::AlignRight);
-    item->setTextAlignment(Qt::AlignCenter);
-    _ui->tableWidget->setItem(i, 0, item);
-    _ui->tableWidget->setItem(i, 1, itemValue);
-  }
+  _ui->tableWidget->setRegisterRange(_options.address, _options.count);
 }

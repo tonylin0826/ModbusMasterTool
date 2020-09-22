@@ -97,8 +97,12 @@ bool Modbus::ModbusTcp::_read(FunctionCode code, const quint16 address, const qu
 
   if (success) {
     _readCallbacks.insert(_transactionId, std::move(cb));
+    _readCount.insert(_transactionId, count);
 
-    QTimer::singleShot(_responseTimeout, [=]() { _readCallbacks.remove(_transactionId); });
+    QTimer::singleShot(_responseTimeout, [=]() {
+      _readCallbacks.remove(_transactionId);
+      _readCount.remove(_transactionId);
+    });
 
     _transactionId++;
   }
@@ -378,6 +382,9 @@ void Modbus::ModbusTcp::_handleReadCoilsResponse(quint16 transactionId, quint16 
   quint8 byteCount = 0;
   stream >> byteCount;
 
+  const quint16 bitCount =
+      _readCount.find(transactionId) == _readCount.end() ? 8 * byteCount : _readCount[transactionId];
+
   QVector<QByteArray> r;
 
   while (!stream.atEnd()) {
@@ -386,7 +393,7 @@ void Modbus::ModbusTcp::_handleReadCoilsResponse(quint16 transactionId, quint16 
 
     std::bitset<8> bits(b);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8 && r.size() < bitCount; i++) {
       QByteArray ba;
       ba.append(static_cast<quint8>(bits[i] ? 0x01 : 0x00));
       r.append(ba);
@@ -421,6 +428,9 @@ void Modbus::ModbusTcp::_handleReadDiscreteInputsResponse(quint16 transactionId,
   quint8 byteCount = 0;
   stream >> byteCount;
 
+  const quint16 bitCount =
+      _readCount.find(transactionId) == _readCount.end() ? 8 * byteCount : _readCount[transactionId];
+
   QVector<QByteArray> r;
 
   while (!stream.atEnd()) {
@@ -429,7 +439,7 @@ void Modbus::ModbusTcp::_handleReadDiscreteInputsResponse(quint16 transactionId,
 
     std::bitset<8> bits(b);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8 && r.size() < bitCount; i++) {
       QByteArray ba;
       ba.append(static_cast<quint8>(bits[i] ? 0x01 : 0x00));
       r.append(ba);
@@ -491,12 +501,12 @@ void Modbus::ModbusTcp::_readFromSocket() {
 
   in >> transactionId >> protocolId >> length >> unitId >> functionCode;
 
-  qDebug() << readBytes.size();
-  qDebug() << readBytes.toHex();
-  qDebug() << "transactionId => " << transactionId;
-  qDebug() << "protocolId => " << protocolId;
-  qDebug() << "length => " << length;
-  qDebug() << "unitId => " << unitId;
+  //  qDebug() << readBytes.size();
+  //  qDebug() << readBytes.toHex();
+  //  qDebug() << "transactionId => " << transactionId;
+  //  qDebug() << "protocolId => " << protocolId;
+  //  qDebug() << "length => " << length;
+  //  qDebug() << "unitId => " << unitId;
 
   const bool exceptionOccured = std::bitset<8>(functionCode)[7];
 
@@ -504,6 +514,7 @@ void Modbus::ModbusTcp::_readFromSocket() {
 
   if (_responseHandlers.find(static_cast<FunctionCode>(functionCode)) == _responseHandlers.end()) {
     _readCallbacks.remove(transactionId);
+    _readCount.remove(transactionId);
     emit modbusErrorOccurred(ModbusErrorCode::InvalidResponseFunctionCode);
     qDebug() << "invalid response function code - " << functionCode;
     return;
@@ -511,8 +522,10 @@ void Modbus::ModbusTcp::_readFromSocket() {
 
   if (exceptionOccured) {
     _responseHandlers[static_cast<FunctionCode>(functionCode)].errorHandler(transactionId, in);
+    _readCount.remove(transactionId);
     return;
   }
 
   _responseHandlers[static_cast<FunctionCode>(functionCode)].responseHandler(transactionId, protocolId, unitId, in);
+  _readCount.remove(transactionId);
 }

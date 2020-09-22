@@ -24,7 +24,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="ModbusRegisterTableWidget" name="tableWidget">
         <column>
          <property name="text">
           <string>address</string>
@@ -42,6 +42,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ModbusRegisterTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>modbusregistertablewidget.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

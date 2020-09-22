@@ -1,11 +1,14 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+#include <QList>
 #include <QMainWindow>
 #include <QMdiSubWindow>
 #include <QResizeEvent>
+#include <QTimer>
 
 #include "modbus.hpp"
+#include "modbussubwindow.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,6 +25,7 @@ class MainWindow : public QMainWindow {
 
  protected:
   bool eventFilter(QObject *object, QEvent *event) override;
+
  private slots:
   void on_mdiArea_subWindowActivated(QMdiSubWindow *arg1);
 
@@ -32,7 +36,12 @@ class MainWindow : public QMainWindow {
  private:
   Ui::MainWindow *_ui;
   Modbus::ModbusTcp *_modbus;
+  QTimer *_pollTimer;
+
+  QList<ModbusSubWindow *> _subwindows;
 
   void _setupUI();
+
+  void _startPolling(int windowIndex = 0);
 };
 #endif  // MAINWINDOW_HPP

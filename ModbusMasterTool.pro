@@ -20,12 +20,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     modbus.cpp \
+    modbusregistertablewidget.cpp \
     modbussubwindow.cpp
 
 HEADERS += \
     addmodbusregisterdialog.hpp \
     mainwindow.hpp \
     modbus.hpp \
+    modbusregistertablewidget.hpp \
     modbussubwindow.hpp
 
 FORMS += \

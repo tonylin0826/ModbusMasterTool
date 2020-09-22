@@ -12,7 +12,10 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), _ui(new Ui::MainWindow), _modbus(new Modbus::ModbusTcp(this, 1)) {
+    : QMainWindow(parent),
+      _ui(new Ui::MainWindow),
+      _modbus(new Modbus::ModbusTcp(this, 1)),
+      _pollTimer(new QTimer(this)) {
   _setupUI();
 
   QObject::connect(_modbus, &Modbus::ModbusTcp::errorOccurred, this,
@@ -21,9 +24,17 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(_modbus, &Modbus::ModbusTcp::modbusErrorOccurred, this,
                    [=](Modbus::ModbusErrorCode error) { qDebug() << "modbus error - " << error; });
 
-  QObject::connect(_modbus, &Modbus::ModbusTcp::disconnected, this, [=]() {});
+  QObject::connect(_modbus, &Modbus::ModbusTcp::disconnected, this, [=]() {
+    _ui->labelConnectionStatus->setText("Disconnected");
+    _ui->btnConnect->setText("Connect");
+  });
 
-  QObject::connect(_modbus, &Modbus::ModbusTcp::connected, this, [=]() {});
+  QObject::connect(_modbus, &Modbus::ModbusTcp::connected, this, [=]() {
+    _ui->labelConnectionStatus->setText("Connected");
+    _ui->btnConnect->setText("Disconnect");
+  });
+
+  _startPolling();
 }
 
 MainWindow::~MainWindow() {
@@ -50,6 +61,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
                        [=](Modbus::RegisterType type, quint16 address, quint16 count) {
                          const auto sub = new ModbusSubWindow(this, {.type = type, .address = address, .count = count});
                          _ui->mdiArea->addSubWindow(sub);
+                         _subwindows.push_back(sub);
 
                          sub->setGeometry(clickPos.x(), clickPos.y(), sub->width(), sub->height());
                          sub->show();
@@ -79,6 +91,71 @@ void MainWindow::_setupUI() {
 
   _ui->mdiArea->installEventFilter(this);
   installEventFilter(this);
+}
+
+void MainWindow::_startPolling(int windowIndex) {
+  const auto nextRound = [=]() { _startPolling(0); };
+  if (!_modbus->isConnected()) {
+    qDebug() << "not connected";
+    QTimer::singleShot(1000, this, nextRound);
+    return;
+  }
+
+  qDebug() << windowIndex << ", " << _subwindows.size();
+  if (windowIndex >= _subwindows.size()) {
+    qDebug() << "last window reached - " << windowIndex << ", " << _subwindows.size();
+    QTimer::singleShot(1000, this, nextRound);
+    return;
+  }
+
+  const auto options = _subwindows[windowIndex]->options();
+
+  switch (options.type) {
+    case Modbus::RegisterType::Coils:
+      _modbus->readCoils(options.address, options.count, [=](Modbus::ModbusReadResult result) {
+        qDebug() << windowIndex << "read coils success - " << result.success;
+
+        if (result.success) {
+          _subwindows[windowIndex]->updateValues(result.results);
+        }
+
+        _startPolling(windowIndex + 1);
+      });
+      break;
+    case Modbus::RegisterType::DiscreteInputs:
+      _modbus->readDiscreteInputs(options.address, options.count, [=](Modbus::ModbusReadResult result) {
+        qDebug() << windowIndex << "read discrete success - " << result.success;
+
+        if (result.success) {
+          _subwindows[windowIndex]->updateValues(result.results);
+        }
+        _startPolling(windowIndex + 1);
+      });
+      break;
+    case Modbus::RegisterType::InputRegisters:
+      _modbus->readInputRegisters(options.address, options.count, [=](Modbus::ModbusReadResult result) {
+        qDebug() << windowIndex << "read input success - " << result.success;
+
+        if (result.success) {
+          _subwindows[windowIndex]->updateValues(result.results);
+        }
+        _startPolling(windowIndex + 1);
+      });
+      break;
+    case Modbus::RegisterType::HoldingRegisters:
+      _modbus->readHoldingRegisters(options.address, options.count, [=](Modbus::ModbusReadResult result) {
+        qDebug() << windowIndex << "read holding success - " << result.success;
+
+        if (result.success) {
+          _subwindows[windowIndex]->updateValues(result.results);
+        }
+        _startPolling(windowIndex + 1);
+      });
+      break;
+    default:
+      QTimer::singleShot(1000, this, nextRound);
+      break;
+  }
 }
 
 void MainWindow::on_actiontest_triggered() {}

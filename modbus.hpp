@@ -81,6 +81,7 @@ class ModbusTcp : public QObject {
  private:
   QTcpSocket *_socket;
   QHash<quint16, ModbusReadCallback> _readCallbacks;
+  QHash<quint16, quint16> _readCount;
   QHash<quint16, ModbusWriteCallback> _writeCallbacks;
   QHash<FunctionCode, ModbusReadResponseHandler> _responseHandlers;
 
