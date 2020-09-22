@@ -142,7 +142,16 @@ class ModbusTcp : public QObject {
 
   void _onConnected() { emit connected(); }
 
-  void _onDisconnected() { emit disconnected(); }
+  void _onDisconnected() {
+    foreach (const ModbusReadCallback &cb, _readCallbacks) { cb({.success = false, .errorMessage = "Disconnected"}); }
+    foreach (const ModbusWriteCallback &cb, _writeCallbacks) { cb({.success = false, .errorMessage = "Disconnected"}); }
+
+    _readCallbacks.clear();
+    _readCount.clear();
+    _writeCallbacks.clear();
+    _transactionId = 1;
+    emit disconnected();
+  }
 
   void _onErrorOccurred(QAbstractSocket::SocketError error) {
     qDebug() << "error " << error << " occured";

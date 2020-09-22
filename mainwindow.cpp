@@ -164,5 +164,6 @@ void MainWindow::on_btnConnect_clicked() {
     return;
   }
 
+  _ui->btnConnect->setDisabled(true);
   _modbus->connect(_ui->inputIp->text(), _ui->inputPort->text().toUShort());
 }
