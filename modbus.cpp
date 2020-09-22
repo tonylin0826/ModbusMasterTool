@@ -240,8 +240,6 @@ bool Modbus::ModbusTcp::writeMultipleRegisters(const quint16 address, const QVec
     buf << static_cast<quint8>(v[0]) << static_cast<quint8>(v[1]);
   }
 
-  qDebug() << "asdsa => " << buf.toHex();
-
   const auto success = _socket->write(buf) > 0;
 
   if (success) {

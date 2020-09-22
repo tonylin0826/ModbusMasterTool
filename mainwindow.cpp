@@ -19,10 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
   _setupUI();
 
   QObject::connect(_modbus, &Modbus::ModbusTcp::errorOccurred, this,
-                   [=](QAbstractSocket::SocketError error) { qDebug() << "socket error - " << error; });
+                   [=](QAbstractSocket::SocketError error) { qWarning() << "socket error - " << error; });
 
   QObject::connect(_modbus, &Modbus::ModbusTcp::modbusErrorOccurred, this,
-                   [=](Modbus::ModbusErrorCode error) { qDebug() << "modbus error - " << error; });
+                   [=](Modbus::ModbusErrorCode error) { qWarning() << "modbus error - " << error; });
 
   QObject::connect(_modbus, &Modbus::ModbusTcp::disconnected, this, [=]() {
     _ui->labelConnectionStatus->setText("Disconnected");
@@ -41,8 +41,6 @@ MainWindow::~MainWindow() {
   _modbus->disconnect();
   delete _ui;
 }
-
-void MainWindow::on_mdiArea_subWindowActivated(QMdiSubWindow *arg1) {}
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
   if (target == _ui->mdiArea && event->type() == QEvent::MouseButtonPress) {
@@ -98,67 +96,56 @@ void MainWindow::_setupUI() {
 }
 
 void MainWindow::_startPolling(int windowIndex) {
-  const auto nextRound = [=]() { _startPolling(0); };
+  const auto nextRound = [=]() { QTimer::singleShot(1000, this, [=]() { _startPolling(0); }); };
   if (!_modbus->isConnected()) {
-    qDebug() << "not connected";
-    QTimer::singleShot(1000, this, nextRound);
+    nextRound();
     return;
   }
 
-  qDebug() << windowIndex << ", " << _subwindows.size();
   if (windowIndex >= _subwindows.size()) {
-    qDebug() << "last window reached - " << windowIndex << ", " << _subwindows.size();
-    QTimer::singleShot(1000, this, nextRound);
+    nextRound();
     return;
   }
 
   const auto options = _subwindows[windowIndex]->options();
 
+  std::function<bool(const quint16, const quint16, Modbus::ModbusReadCallback cb)> readFunc;
+
   switch (options.type) {
     case Modbus::RegisterType::Coils:
-      _modbus->readCoils(options.address, options.count, [=](Modbus::ModbusReadResult result) {
-        qDebug() << windowIndex << "read coils success - " << result.success;
-
-        if (result.success) {
-          _subwindows[windowIndex]->updateValues(result.results);
-        }
-
-        _startPolling(windowIndex + 1);
-      });
+      readFunc = std::bind(&Modbus::ModbusTcp::readCoils, _modbus, std::placeholders::_1, std::placeholders::_2,
+                           std::placeholders::_3);
       break;
     case Modbus::RegisterType::DiscreteInputs:
-      _modbus->readDiscreteInputs(options.address, options.count, [=](Modbus::ModbusReadResult result) {
-        qDebug() << windowIndex << "read discrete success - " << result.success;
-
-        if (result.success) {
-          _subwindows[windowIndex]->updateValues(result.results);
-        }
-        _startPolling(windowIndex + 1);
-      });
+      readFunc = std::bind(&Modbus::ModbusTcp::readDiscreteInputs, _modbus, std::placeholders::_1,
+                           std::placeholders::_2, std::placeholders::_3);
       break;
     case Modbus::RegisterType::InputRegisters:
-      _modbus->readInputRegisters(options.address, options.count, [=](Modbus::ModbusReadResult result) {
-        qDebug() << windowIndex << "read input success - " << result.success;
-
-        if (result.success) {
-          _subwindows[windowIndex]->updateValues(result.results);
-        }
-        _startPolling(windowIndex + 1);
-      });
+      readFunc = std::bind(&Modbus::ModbusTcp::readInputRegisters, _modbus, std::placeholders::_1,
+                           std::placeholders::_2, std::placeholders::_3);
       break;
     case Modbus::RegisterType::HoldingRegisters:
-      _modbus->readHoldingRegisters(options.address, options.count, [=](Modbus::ModbusReadResult result) {
-        qDebug() << windowIndex << "read holding success - " << result.success;
-
-        if (result.success) {
-          _subwindows[windowIndex]->updateValues(result.results);
-        }
-        _startPolling(windowIndex + 1);
-      });
+      readFunc = std::bind(&Modbus::ModbusTcp::readHoldingRegisters, _modbus, std::placeholders::_1,
+                           std::placeholders::_2, std::placeholders::_3);
       break;
     default:
-      QTimer::singleShot(1000, this, nextRound);
-      break;
+      nextRound();
+      return;
+  }
+
+  const auto success = readFunc(options.address, options.count, [=](Modbus::ModbusReadResult result) {
+    qDebug() << windowIndex << "read" << options.type << "success - " << result.success;
+
+    if (result.success) {
+      _subwindows[windowIndex]->updateValues(result.results);
+    }
+
+    _startPolling(windowIndex + 1);
+  });
+
+  if (!success) {
+    qWarning() << windowIndex << "read" << options.type << "success - " << success;
+    nextRound();
   }
 }
 
@@ -173,7 +160,7 @@ void MainWindow::on_btnConnect_clicked() {
   qDebug() << _ui->inputPort->hasAcceptableInput() << " " << _ui->inputIp->hasAcceptableInput();
   if (!_ui->inputPort->hasAcceptableInput() || !_ui->inputIp->hasAcceptableInput()) {
     // TODO: show error message
-    qDebug() << "invalid input";
+    qWarning() << "invalid input";
     return;
   }
 

@@ -27,8 +27,6 @@ class MainWindow : public QMainWindow {
   bool eventFilter(QObject *object, QEvent *event) override;
 
  private slots:
-  void on_mdiArea_subWindowActivated(QMdiSubWindow *arg1);
-
   void on_actiontest_triggered();
 
   void on_btnConnect_clicked();
