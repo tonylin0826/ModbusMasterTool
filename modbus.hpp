@@ -154,7 +154,7 @@ class ModbusTcp : public QObject {
   }
 
   void _onErrorOccurred(QAbstractSocket::SocketError error) {
-    qDebug() << "error " << error << " occured";
+    qDebug() << "error" << error << "occured";
     emit errorOccurred(error);
   }
 
