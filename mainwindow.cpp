@@ -10,6 +10,7 @@
 #include "addmodbusregisterdialog.hpp"
 #include "modbussubwindow.hpp"
 #include "ui_mainwindow.h"
+#include "writesingleregisterdialog.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -62,6 +63,12 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
                          QObject::connect(sub, &ModbusSubWindow::registerClicked, this,
                                           [=](Modbus::RegisterType type, quint16 address) -> void {
                                             qDebug() << "register clicked" << type << address;
+
+                                            if (type == Modbus::RegisterType::HoldingRegisters) {
+                                              const auto dialog = new WriteSingleRegisterDialog(this);
+
+                                              dialog->exec();
+                                            }
                                           });
 
                          QObject::connect(sub, &ModbusSubWindow::closed, this,

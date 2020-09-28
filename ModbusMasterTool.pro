@@ -21,19 +21,23 @@ SOURCES += \
     mainwindow.cpp \
     modbus.cpp \
     modbusregistertablewidget.cpp \
-    modbussubwindow.cpp
+    modbussubwindow.cpp \
+    writesingleregisterdialog.cpp
 
 HEADERS += \
     addmodbusregisterdialog.hpp \
     mainwindow.hpp \
     modbus.hpp \
     modbusregistertablewidget.hpp \
-    modbussubwindow.hpp
+    modbussubwindow.hpp \
+    writesingleregisterdialog.hpp
 
 FORMS += \
     addmodbusregisterdialog.ui \
     mainwindow.ui \
-    modbussubwindow.ui
+    modbussubwindow.ui \
+    writeregisterdialog.ui \
+    writesingleregisterdialog.ui
 
 TRANSLATIONS += \
     ModbusMasterTool_en_US.ts
