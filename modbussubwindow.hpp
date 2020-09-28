@@ -37,6 +37,8 @@ class ModbusSubWindow : public QMdiSubWindow {
  signals:
   void closed(ModbusSubWindow *windowPtr);
 
+  void registerClicked(Modbus::RegisterType type, quint16 address);
+
  private:
   Ui::ModbusSubWindow *_ui;
 

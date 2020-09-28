@@ -122,6 +122,9 @@ class ModbusRegisterTableWidget : public QTableWidget {
 
   void setRegisterRange(quint16 address, quint16 count);
 
+ signals:
+  void registerClicked();
+
  private:
   QMenu *_menu;
 

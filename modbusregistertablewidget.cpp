@@ -61,6 +61,8 @@ void ModbusRegisterTableWidget::_setup() {
   setContextMenuPolicy(Qt::CustomContextMenu);
   verticalHeader()->hide();
 
+  setEditTriggers(QAbstractItemView::NoEditTriggers);
+
   // setup menu
   _menu = new QMenu(tr("Context Menu"), this);
 

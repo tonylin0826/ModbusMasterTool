@@ -59,6 +59,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
                        [=](Modbus::RegisterType type, quint16 address, quint16 count) {
                          const auto sub = new ModbusSubWindow(this, {.type = type, .address = address, .count = count});
 
+                         QObject::connect(sub, &ModbusSubWindow::registerClicked, this,
+                                          [=](Modbus::RegisterType type, quint16 address) -> void {
+                                            qDebug() << "register clicked" << type << address;
+                                          });
+
                          QObject::connect(sub, &ModbusSubWindow::closed, this,
                                           [=](ModbusSubWindow *ptr) -> void { _subwindows.removeOne(ptr); });
 

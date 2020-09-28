@@ -29,6 +29,14 @@ ModbusSubWindow::ModbusSubWindow(QWidget *parent, ModbusSubWindowOptions options
       qDebug() << item->text();
     }
   });
+
+  QObject::connect(_ui->tableWidget, &ModbusRegisterTableWidget::doubleClicked, this, [=](const QModelIndex &index) {
+    if (index.column() == 0) {
+      return;
+    }
+
+    emit registerClicked(_options.type, _options.address + index.row());
+  });
 }
 
 ModbusSubWindow::~ModbusSubWindow() { delete _ui; }
