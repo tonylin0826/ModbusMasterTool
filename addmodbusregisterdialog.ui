@@ -27,12 +27,12 @@
       <widget class="QComboBox" name="selectType">
        <item>
         <property name="text">
-         <string>Coils</string>
+         <string>Discrete Inputs</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Discrete Inputs</string>
+         <string>Coils</string>
         </property>
        </item>
        <item>

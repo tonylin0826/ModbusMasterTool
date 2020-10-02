@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QIntValidator>
 #include <QLabel>
+#include <QModbusTcpClient>
 #include <QObject>
 #include <QRegularExpression>
 
@@ -13,33 +14,39 @@
 #include "writesingleregisterdialog.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      _ui(new Ui::MainWindow),
-      _modbus(new Modbus::ModbusTcp(this, 1)),
-      _pollTimer(new QTimer(this)) {
+    : QMainWindow(parent), _ui(new Ui::MainWindow), _modbus(new QModbusTcpClient(this)), _pollTimer(new QTimer(this)) {
   _setupUI();
 
-  QObject::connect(_modbus, &Modbus::ModbusTcp::errorOccurred, this,
-                   [=](QAbstractSocket::SocketError error) { qWarning() << "socket error - " << error; });
+  QObject::connect(_modbus, &QModbusClient::errorOccurred, this,
+                   [=](QModbusDevice::Error e) { qDebug() << e << _modbus->errorString(); });
 
-  QObject::connect(_modbus, &Modbus::ModbusTcp::modbusErrorOccurred, this,
-                   [=](Modbus::ModbusErrorCode error) { qWarning() << "modbus error - " << error; });
-
-  QObject::connect(_modbus, &Modbus::ModbusTcp::disconnected, this, [=]() {
-    _ui->labelConnectionStatus->setText("Disconnected");
-    _ui->btnConnect->setText("Connect");
-  });
-
-  QObject::connect(_modbus, &Modbus::ModbusTcp::connected, this, [=]() {
-    _ui->labelConnectionStatus->setText("Connected");
-    _ui->btnConnect->setText("Disconnect");
+  QObject::connect(_modbus, &QModbusClient::stateChanged, [=](int state) {
+    qDebug() << "state" << state;
+    switch (state) {
+      case QModbusDevice::State::ConnectedState:
+        _ui->labelConnectionStatus->setText("Connected");
+        _ui->btnConnect->setText("Disconnect");
+        break;
+      case QModbusDevice::State::UnconnectedState:
+        _ui->labelConnectionStatus->setText("Disconnected");
+        _ui->btnConnect->setText("Connect");
+        break;
+      case QModbusDevice::State::ConnectingState:
+        _ui->labelConnectionStatus->setText("Connecting");
+        _ui->btnConnect->setText("Disconnect");
+        break;
+      default:
+        _ui->labelConnectionStatus->setText("Disconnected");
+        _ui->btnConnect->setText("Connect");
+        break;
+    }
   });
 
   _startPolling();
 }
 
 MainWindow::~MainWindow() {
-  _modbus->disconnect();
+  _modbus->disconnectDevice();
   delete _ui;
 }
 
@@ -57,14 +64,14 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
     QObject::connect(&action1, &QAction::triggered, this, [=]() {
       const auto dialog = new AddModbusRegisterDialog(this);
       QObject::connect(dialog, &AddModbusRegisterDialog::oked, this,
-                       [=](Modbus::RegisterType type, quint16 address, quint16 count) {
+                       [=](QModbusDataUnit::RegisterType type, quint16 address, quint16 count) {
                          const auto sub = new ModbusSubWindow(this, {.type = type, .address = address, .count = count});
 
                          QObject::connect(sub, &ModbusSubWindow::registerClicked, this,
-                                          [=](Modbus::RegisterType type, quint16 address) -> void {
+                                          [=](QModbusDataUnit::RegisterType type, quint16 address) -> void {
                                             qDebug() << "register clicked" << type << address;
 
-                                            if (type == Modbus::RegisterType::HoldingRegisters) {
+                                            if (type == QModbusDataUnit::RegisterType::HoldingRegisters) {
                                               const auto dialog = new WriteSingleRegisterDialog(this);
 
                                               dialog->exec();
@@ -101,6 +108,7 @@ void MainWindow::_setupUI() {
   QRegularExpression IpRegex("^" + IpRange + "(\\." + IpRange + ")" + "(\\." + IpRange + ")" + "(\\." + IpRange + ")$");
 
   _ui->inputIp->setText("0.0.0.0");
+  _ui->inputIp->setText("10.211.55.3");
   //  _ui->inputPort->setValidator(new QRegularExpressionValidator(IpRegex, this));
 
   _ui->mdiArea->installEventFilter(this);
@@ -109,63 +117,61 @@ void MainWindow::_setupUI() {
 
 void MainWindow::_startPolling(int windowIndex) {
   const auto nextRound = [=]() { QTimer::singleShot(1000, this, [=]() { _startPolling(0); }); };
-  if (!_modbus->isConnected()) {
+  const auto nextWindow = [=]() { QTimer::singleShot(0, this, [=]() { _startPolling(windowIndex + 1); }); };
+
+  if (_modbus->state() != QModbusClient::State::ConnectedState) {
+    qWarning() << "_startPolling not connected";
     nextRound();
     return;
   }
 
   if (windowIndex >= _subwindows.size()) {
+    qWarning() << "_startPolling last one";
     nextRound();
     return;
   }
 
   const auto options = _subwindows[windowIndex]->options();
 
-  std::function<bool(const quint16, const quint16, Modbus::ModbusReadCallback cb)> readFunc;
-
-  switch (options.type) {
-    case Modbus::RegisterType::Coils:
-      readFunc = std::bind(&Modbus::ModbusTcp::readCoils, _modbus, std::placeholders::_1, std::placeholders::_2,
-                           std::placeholders::_3);
-      break;
-    case Modbus::RegisterType::DiscreteInputs:
-      readFunc = std::bind(&Modbus::ModbusTcp::readDiscreteInputs, _modbus, std::placeholders::_1,
-                           std::placeholders::_2, std::placeholders::_3);
-      break;
-    case Modbus::RegisterType::InputRegisters:
-      readFunc = std::bind(&Modbus::ModbusTcp::readInputRegisters, _modbus, std::placeholders::_1,
-                           std::placeholders::_2, std::placeholders::_3);
-      break;
-    case Modbus::RegisterType::HoldingRegisters:
-      readFunc = std::bind(&Modbus::ModbusTcp::readHoldingRegisters, _modbus, std::placeholders::_1,
-                           std::placeholders::_2, std::placeholders::_3);
-      break;
-    default:
-      nextRound();
-      return;
+  const auto *reply = _modbus->sendReadRequest(QModbusDataUnit(options.type, options.address, options.count), 1);
+  if (!reply) {
+    qWarning() << windowIndex << "read" << options.type << "failed";
+    nextWindow();
+    return;
   }
 
-  const auto success = readFunc(options.address, options.count, [=](Modbus::ModbusReadResult result) {
-    qDebug() << windowIndex << "read" << options.type << "success - " << result.success;
+  if (reply->isFinished()) {
+    delete reply;
+    nextWindow();
+    return;
+  }
 
-    if (result.success) {
-      _subwindows[windowIndex]->updateValues(result.results);
+  QObject::connect(reply, &QModbusReply::finished, [=]() {
+    if (reply->error() != QModbusDevice::NoError) {
+      qDebug() << "Read response error:" << reply->errorString() << "(code:" << reply->rawResult().exceptionCode()
+               << ")";
+      nextWindow();
+      return;
     }
 
-    _startPolling(windowIndex + 1);
-  });
+    const QModbusDataUnit unit = reply->result();
+    QVector<QByteArray> bytes;
+    foreach (const quint16 &elem, reply->result().values()) {
+      QByteArray ba;
+      ba.append(quint8(elem >> 8)).append(quint8(elem));
+      bytes.append(ba);
+    }
 
-  if (!success) {
-    qWarning() << windowIndex << "read" << options.type << "success - " << success;
-    nextRound();
-  }
+    _subwindows[windowIndex]->updateValues(bytes);
+
+    nextWindow();
+  });
 }
 
 void MainWindow::on_actiontest_triggered() {}
 
 void MainWindow::on_btnConnect_clicked() {
-  if (_modbus->isConnected()) {
-    _modbus->disconnect();
+  if (_modbus->state() == QModbusClient::ConnectedState || _modbus->state() == QModbusClient::ConnectingState) {
     return;
   }
 
@@ -177,5 +183,12 @@ void MainWindow::on_btnConnect_clicked() {
   }
 
   _ui->btnConnect->setDisabled(true);
-  _modbus->connect(_ui->inputIp->text(), _ui->inputPort->text().toUShort());
+
+  _modbus->setConnectionParameter(QModbusDevice::NetworkPortParameter, QVariant(_ui->inputPort->text().toUShort()));
+  _modbus->setConnectionParameter(QModbusDevice::NetworkAddressParameter, QVariant(_ui->inputIp->text()));
+
+  _modbus->setTimeout(3000);
+  _modbus->setNumberOfRetries(3);
+
+  _modbus->connectDevice();
 }

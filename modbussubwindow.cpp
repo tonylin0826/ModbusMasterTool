@@ -13,9 +13,6 @@
 
 #include "ui_modbussubwindow.h"
 
-ModbusSubWindow::ModbusSubWindow(QWidget *parent, Modbus::RegisterType type, quint16 address, quint16 count)
-    : ModbusSubWindow(parent, {.type = type, .address = address, .count = count}) {}
-
 ModbusSubWindow::ModbusSubWindow(QWidget *parent, ModbusSubWindowOptions options)
     : QMdiSubWindow(parent), _ui(new Ui::ModbusSubWindow), _options(options) {
   _setupUi();
@@ -64,7 +61,7 @@ void ModbusSubWindow::_setupUi() {
   _ui->setupUi(this);
   setWidget(_ui->frame);
 
-  const QString titles[4] = {"Coils", "Discrete Inputs", "Input Registers", "Holding Registers"};
+  const QString titles[5] = {"Invaid", "Coils", "Discrete Inputs", "Input Registers", "Holding Registers"};
   setWindowTitle(titles[_options.type]);
 
   _ui->tableWidget->setRegisterRange(_options.address, _options.count);

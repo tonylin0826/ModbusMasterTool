@@ -36,7 +36,7 @@ void AddModbusRegisterDialog::on_btnOk_clicked() {
   const quint16 count = _ui->inputCount->text().toUInt();
   const quint16 address = _ui->inputAddress->text().toUInt();
 
-  emit oked(static_cast<Modbus::RegisterType>(_ui->selectType->currentIndex()), address, count);
+  emit oked(static_cast<QModbusDataUnit::RegisterType>(_ui->selectType->currentIndex() + 1), address, count);
   close();
 }
 
@@ -48,7 +48,7 @@ void AddModbusRegisterDialog::_setupUI() {
 }
 
 QPair<bool, QString> AddModbusRegisterDialog::_isInputValid() {
-  const auto type = static_cast<Modbus::RegisterType>(_ui->selectType->currentIndex());
+  const auto type = static_cast<QModbusDataUnit::RegisterType>(_ui->selectType->currentIndex() + 1);
 
   const quint16 counts[4] = {2000, 2000, 125, 125};
 
@@ -68,7 +68,7 @@ QPair<bool, QString> AddModbusRegisterDialog::_isInputValid() {
 }
 
 void AddModbusRegisterDialog::_onInputChanged() {
-  const auto type = static_cast<Modbus::RegisterType>(_ui->selectType->currentIndex());
+  const auto type = static_cast<QModbusDataUnit::RegisterType>(_ui->selectType->currentIndex() + 1);
 
   const quint16 counts[4] = {2000, 2000, 125, 125};
 

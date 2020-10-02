@@ -2,29 +2,29 @@
 #define MODBUSSUBWINDOW_HPP
 
 #include <QMdiSubWindow>
+#include <QModbusDataUnit>
 #include <QResizeEvent>
-
-#include "modbus.hpp"
 
 namespace Ui {
 class ModbusSubWindow;
 }
 
 typedef struct {
+  QModbusDataUnit::RegisterType type;
   quint16 address;
   quint16 count;
-  Modbus::RegisterType type;
 } ModbusSubWindowOptions;
 
 class ModbusSubWindow : public QMdiSubWindow {
   Q_OBJECT
 
  public:
-  ModbusSubWindow(QWidget *parent = nullptr, Modbus::RegisterType type = Modbus::RegisterType::Coils,
+  ModbusSubWindow(QWidget *parent = nullptr, QModbusDataUnit::RegisterType type = QModbusDataUnit::RegisterType::Coils,
                   quint16 address = 0, quint16 count = 10);
 
   ModbusSubWindow(QWidget *parent = nullptr,
-                  ModbusSubWindowOptions options = {.address = 0, .count = 10, .type = Modbus::RegisterType::Coils});
+                  ModbusSubWindowOptions options = {
+                      .type = QModbusDataUnit::RegisterType::Coils, .address = 0, .count = 10});
 
   ~ModbusSubWindow();
 
@@ -37,7 +37,7 @@ class ModbusSubWindow : public QMdiSubWindow {
  signals:
   void closed(ModbusSubWindow *windowPtr);
 
-  void registerClicked(Modbus::RegisterType type, quint16 address);
+  void registerClicked(QModbusDataUnit::RegisterType type, quint16 address);
 
  private:
   Ui::ModbusSubWindow *_ui;

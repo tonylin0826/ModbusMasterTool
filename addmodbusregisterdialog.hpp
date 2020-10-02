@@ -2,9 +2,8 @@
 #define ADDMODBUSREGISTERDIALOG_HPP
 
 #include <QDialog>
+#include <QModbusDataUnit>
 #include <QPair>
-
-#include "modbus.hpp"
 
 namespace Ui {
 class AddModbusRegisterDialog;
@@ -38,7 +37,7 @@ class AddModbusRegisterDialog : public QDialog {
   void _onInputChanged();
 
  signals:
-  void oked(Modbus::RegisterType type, quint16 address, quint16 count);
+  void oked(QModbusDataUnit::RegisterType type, quint16 address, quint16 count);
   void canceled();
 };
 

@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network serialbus
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,7 +19,6 @@ SOURCES += \
     addmodbusregisterdialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    modbus.cpp \
     modbusregistertablewidget.cpp \
     modbussubwindow.cpp \
     writesingleregisterdialog.cpp
@@ -27,7 +26,6 @@ SOURCES += \
 HEADERS += \
     addmodbusregisterdialog.hpp \
     mainwindow.hpp \
-    modbus.hpp \
     modbusregistertablewidget.hpp \
     modbussubwindow.hpp \
     writesingleregisterdialog.hpp

@@ -4,10 +4,10 @@
 #include <QList>
 #include <QMainWindow>
 #include <QMdiSubWindow>
+#include <QModbusClient>
 #include <QResizeEvent>
 #include <QTimer>
 
-#include "modbus.hpp"
 #include "modbussubwindow.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -33,7 +33,7 @@ class MainWindow : public QMainWindow {
 
  private:
   Ui::MainWindow *_ui;
-  Modbus::ModbusTcp *_modbus;
+  QModbusClient *_modbus;
   QTimer *_pollTimer;
 
   QList<ModbusSubWindow *> _subwindows;
