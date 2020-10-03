@@ -75,7 +75,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
                                             qDebug() << "register clicked" << type << address;
 
                                             if (type == QModbusDataUnit::RegisterType::HoldingRegisters) {
-                                              const auto dialog = new WriteSingleRegisterDialog(this);
+                                              const auto dialog = new WriteSingleRegisterDialog(this, address);
 
                                               dialog->exec();
                                             }

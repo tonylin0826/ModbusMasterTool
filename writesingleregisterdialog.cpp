@@ -6,19 +6,22 @@
 
 #include "ui_writesingleregisterdialog.h"
 
-WriteSingleRegisterDialog::WriteSingleRegisterDialog(MainWindow *parent)
+WriteSingleRegisterDialog::WriteSingleRegisterDialog(MainWindow *parent, quint16 startingAddress)
     : QDialog(parent), ui(new Ui::WriteSingleRegisterDialog) {
-  _setupUI();
+  _setupUI(startingAddress);
 }
 
 WriteSingleRegisterDialog::~WriteSingleRegisterDialog() { delete ui; }
 
-void WriteSingleRegisterDialog::_setupUI() {
+void WriteSingleRegisterDialog::_setupUI(quint16 startingAddress) {
   setAttribute(Qt::WA_DeleteOnClose);
   ui->setupUi(this);
   setWindowTitle("Write Single Register");
 
   ui->inputAddress->setValidator(new QIntValidator(0, 65535, this));
+  ui->inputAddress->setText(QString::number(startingAddress));
+
+  ui->inputValue->setText("0");
 }
 
 void WriteSingleRegisterDialog::on_btnSend_clicked() {
@@ -62,3 +65,5 @@ void WriteSingleRegisterDialog::on_btnSend_clicked() {
     delete reply;
   });
 }
+
+void WriteSingleRegisterDialog::on_btnCancel_clicked() { close(); }
