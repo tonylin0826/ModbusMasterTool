@@ -116,7 +116,7 @@
      <item>
       <widget class="QLabel" name="labelStatus">
        <property name="text">
-        <string>Ok</string>
+        <string/>
        </property>
       </widget>
      </item>

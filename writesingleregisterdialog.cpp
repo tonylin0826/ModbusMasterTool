@@ -22,6 +22,7 @@ void WriteSingleRegisterDialog::_setupUI(quint16 startingAddress) {
   ui->inputAddress->setText(QString::number(startingAddress));
 
   ui->inputValue->setText("0");
+  ui->inputValue->setFocus();
 }
 
 void WriteSingleRegisterDialog::on_btnSend_clicked() {
