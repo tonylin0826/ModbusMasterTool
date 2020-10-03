@@ -21,7 +21,10 @@ class MainWindow : public QMainWindow {
 
  public:
   MainWindow(QWidget *parent = nullptr);
+
   ~MainWindow();
+
+  inline QModbusClient *modbus() { return _modbus; }
 
  protected:
   bool eventFilter(QObject *object, QEvent *event) override;

@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "mainwindow.hpp"
+
 namespace Ui {
 class WriteSingleRegisterDialog;
 }
@@ -11,8 +13,11 @@ class WriteSingleRegisterDialog : public QDialog {
   Q_OBJECT
 
  public:
-  explicit WriteSingleRegisterDialog(QWidget *parent = nullptr);
+  explicit WriteSingleRegisterDialog(MainWindow *parent = nullptr);
   ~WriteSingleRegisterDialog();
+
+ private slots:
+  void on_btnSend_clicked();
 
  private:
   Ui::WriteSingleRegisterDialog *ui;

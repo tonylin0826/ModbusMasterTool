@@ -24,10 +24,12 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << "state" << state;
     switch (state) {
       case QModbusDevice::State::ConnectedState:
+        _ui->btnConnect->setDisabled(false);
         _ui->labelConnectionStatus->setText("Connected");
         _ui->btnConnect->setText("Disconnect");
         break;
       case QModbusDevice::State::UnconnectedState:
+        _ui->btnConnect->setDisabled(false);
         _ui->labelConnectionStatus->setText("Disconnected");
         _ui->btnConnect->setText("Connect");
         break;
@@ -36,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
         _ui->btnConnect->setText("Disconnect");
         break;
       default:
+        _ui->btnConnect->setDisabled(false);
         _ui->labelConnectionStatus->setText("Disconnected");
         _ui->btnConnect->setText("Connect");
         break;
@@ -151,6 +154,7 @@ void MainWindow::_startPolling(int windowIndex) {
       qDebug() << "Read response error:" << reply->errorString() << "(code:" << reply->rawResult().exceptionCode()
                << ")";
       nextWindow();
+      delete reply;
       return;
     }
 
@@ -165,6 +169,8 @@ void MainWindow::_startPolling(int windowIndex) {
     _subwindows[windowIndex]->updateValues(bytes);
 
     nextWindow();
+
+    delete reply;
   });
 }
 
@@ -172,6 +178,7 @@ void MainWindow::on_actiontest_triggered() {}
 
 void MainWindow::on_btnConnect_clicked() {
   if (_modbus->state() == QModbusClient::ConnectedState || _modbus->state() == QModbusClient::ConnectingState) {
+    _modbus->disconnectDevice();
     return;
   }
 

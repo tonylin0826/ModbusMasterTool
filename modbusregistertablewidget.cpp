@@ -29,9 +29,8 @@ void ModbusRegisterTableWidget::updateValues(const QVector<QByteArray> &values) 
         tableItemTmp->setValue("");
       }
     }
-    qDebug() << "asd:" << b.toHex();
-    tableItem->setValue(b);
 
+    tableItem->setValue(b);
     i += wordSize;
   }
 }
