@@ -11,6 +11,7 @@
 #include "addmodbusregisterdialog.hpp"
 #include "modbussubwindow.hpp"
 #include "ui_mainwindow.h"
+#include "writesinglecoildialog.hpp"
 #include "writesingleregisterdialog.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -76,8 +77,14 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
 
                                             if (type == QModbusDataUnit::RegisterType::HoldingRegisters) {
                                               const auto dialog = new WriteSingleRegisterDialog(this, address);
-
                                               dialog->exec();
+                                              return;
+                                            }
+
+                                            if (type == QModbusDataUnit::RegisterType::Coils) {
+                                              const auto dialog = new WriteSingleCoilDialog(this, address);
+                                              dialog->exec();
+                                              return;
                                             }
                                           });
 
@@ -136,7 +143,7 @@ void MainWindow::_startPolling(int windowIndex) {
 
   const auto options = _subwindows[windowIndex]->options();
 
-  const auto *reply = _modbus->sendReadRequest(QModbusDataUnit(options.type, options.address, options.count), 1);
+  const auto reply = _modbus->sendReadRequest(QModbusDataUnit(options.type, options.address, options.count), 1);
   if (!reply) {
     qWarning() << windowIndex << "read" << options.type << "failed";
     nextWindow();
@@ -194,8 +201,8 @@ void MainWindow::on_btnConnect_clicked() {
   _modbus->setConnectionParameter(QModbusDevice::NetworkPortParameter, QVariant(_ui->inputPort->text().toUShort()));
   _modbus->setConnectionParameter(QModbusDevice::NetworkAddressParameter, QVariant(_ui->inputIp->text()));
 
-  _modbus->setTimeout(3000);
-  _modbus->setNumberOfRetries(3);
+  _modbus->setTimeout(100);
+  _modbus->setNumberOfRetries(0);
 
   _modbus->connectDevice();
 }

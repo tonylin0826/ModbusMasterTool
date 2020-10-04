@@ -21,6 +21,7 @@ SOURCES += \
     mainwindow.cpp \
     modbusregistertablewidget.cpp \
     modbussubwindow.cpp \
+    writesinglecoildialog.cpp \
     writesingleregisterdialog.cpp
 
 HEADERS += \
@@ -28,6 +29,7 @@ HEADERS += \
     mainwindow.hpp \
     modbusregistertablewidget.hpp \
     modbussubwindow.hpp \
+    writesinglecoildialog.hpp \
     writesingleregisterdialog.hpp
 
 FORMS += \
@@ -35,6 +37,7 @@ FORMS += \
     mainwindow.ui \
     modbussubwindow.ui \
     writeregisterdialog.ui \
+    writesinglecoildialog.ui \
     writesingleregisterdialog.ui
 
 TRANSLATIONS += \

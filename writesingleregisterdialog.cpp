@@ -21,22 +21,26 @@ void WriteSingleRegisterDialog::_setupUI(quint16 startingAddress) {
   ui->inputAddress->setValidator(new QIntValidator(0, 65535, this));
   ui->inputAddress->setText(QString::number(startingAddress));
 
+  ui->inputSlaveId->setText("1");
+  ui->inputSlaveId->setValidator(new QIntValidator(0, 255, this));
+
   ui->inputValue->setText("0");
   ui->inputValue->setFocus();
 }
 
 void WriteSingleRegisterDialog::on_btnSend_clicked() {
-  if (ui->inputAddress->text().isEmpty() || ui->inputValue->text().isEmpty()) {
+  if (ui->inputAddress->text().isEmpty() || ui->inputValue->text().isEmpty() || ui->inputSlaveId->text().isEmpty()) {
     return;
   }
 
   const auto address = ui->inputAddress->text().toUShort();
   const auto value = ui->inputValue->text().toUShort();
+  const auto slaveId = ui->inputSlaveId->text().toUShort();
 
   const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
 
   const auto reply = modbus->sendWriteRequest(
-      QModbusDataUnit(QModbusDataUnit::HoldingRegisters, address, QVector<quint16>({value})), 1);
+      QModbusDataUnit(QModbusDataUnit::HoldingRegisters, address, QVector<quint16>({value})), slaveId);
 
   if (!reply) {
     ui->labelStatus->setText("Failed - No reply");
