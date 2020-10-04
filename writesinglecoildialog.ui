@@ -83,6 +83,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QPushButton" name="btnSend">
+         <property name="styleSheet">
+          <string notr="true">color: white</string>
+         </property>
          <property name="text">
           <string>Send</string>
          </property>
@@ -90,6 +93,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="btnCancel">
+         <property name="styleSheet">
+          <string notr="true">color: white</string>
+         </property>
          <property name="text">
           <string>Cancel</string>
          </property>
