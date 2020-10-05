@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>WriteRegisterDialog</class>
+ <widget class="QDialog" name="WriteRegisterDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -12,6 +12,11 @@
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#WriteRegisterDialog {
+	background: rgb(60, 63, 65);
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0">

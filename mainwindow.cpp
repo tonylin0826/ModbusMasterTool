@@ -122,6 +122,7 @@ void MainWindow::_setupUI() {
   //  _ui->inputPort->setValidator(new QRegularExpressionValidator(IpRegex, this));
 
   _ui->mdiArea->installEventFilter(this);
+  _ui->mdiArea->setBackground(QBrush(QColor(60, 63, 65)));
   installEventFilter(this);
 }
 
