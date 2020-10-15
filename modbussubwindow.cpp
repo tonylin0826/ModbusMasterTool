@@ -61,7 +61,7 @@ void ModbusSubWindow::_setupUi() {
   _ui->setupUi(this);
   setWidget(_ui->frame);
 
-  const QString titles[5] = {"Invaid", "Coils", "Discrete Inputs", "Input Registers", "Holding Registers"};
+  const QString titles[5] = {"Invaid", "Discrete Inputs", "Coils", "Input Registers", "Holding Registers"};
   setWindowTitle(titles[_options.type]);
 
   _ui->tableWidget->setRegisterRange(_options.address, _options.count);

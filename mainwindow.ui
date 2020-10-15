@@ -14,9 +14,7 @@
    <string>Modbus Master</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#MainWindow {
-	background: rgb(60, 63, 65);
-}</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -38,12 +36,7 @@
     <item>
      <widget class="QFrame" name="connectionFrame">
       <property name="styleSheet">
-       <string notr="true">#connectionFrame {
-	border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: rgb(81,81,81);
-	background: rgb(60, 63, 65);
-}</string>
+       <string notr="true"/>
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <property name="leftMargin">
@@ -196,12 +189,7 @@
     <item>
      <widget class="QFrame" name="statusFrame">
       <property name="styleSheet">
-       <string notr="true">#statusFrame {
-	border-top-width: 1px;
-    border-top-style: solid;
-    border-top-color: rgb(81,81,81);
-	background: rgb(60, 63, 65);
-}</string>
+       <string notr="true"/>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <property name="spacing">

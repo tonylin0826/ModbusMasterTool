@@ -14,9 +14,7 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#WriteRegisterDialog {
-	background: rgb(60, 63, 65);
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0">

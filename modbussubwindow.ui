@@ -55,11 +55,6 @@
       </property>
       <item row="0" column="0">
        <widget class="ModbusRegisterTableWidget" name="tableWidget">
-        <property name="styleSheet">
-         <string notr="true">#tableWidget {
-	background: rgb(60, 63, 65);
-}</string>
-        </property>
         <column>
          <property name="text">
           <string>address</string>

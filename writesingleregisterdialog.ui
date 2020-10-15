@@ -13,10 +13,8 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">#WriteSingleRegisterDialog {
-	background: rgb(60, 63, 65);
-}</string>
+  <property name="autoFillBackground">
+   <bool>false</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0">
@@ -110,7 +108,7 @@
          <item>
           <widget class="QPushButton" name="btnCancel">
            <property name="styleSheet">
-            <string notr="true">color: white</string>
+            <string notr="true"/>
            </property>
            <property name="text">
             <string>Cancel</string>

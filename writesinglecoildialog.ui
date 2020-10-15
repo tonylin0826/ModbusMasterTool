@@ -13,11 +13,6 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">#WriteSingleCoilDialog {
-	background: rgb(60, 63, 65);
-}</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -99,7 +94,7 @@
        <item>
         <widget class="QPushButton" name="btnCancel">
          <property name="styleSheet">
-          <string notr="true">color: white</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Cancel</string>
