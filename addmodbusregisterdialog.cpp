@@ -7,9 +7,7 @@
 
 AddModbusRegisterDialog::AddModbusRegisterDialog(QWidget *parent)
     : QDialog(parent), _ui(new Ui::AddModbusRegisterDialog) {
-  _ui->setupUi(this);
   _setupUI();
-  setAttribute(Qt::WA_DeleteOnClose);
 }
 
 AddModbusRegisterDialog::~AddModbusRegisterDialog() { delete _ui; }
@@ -41,10 +39,15 @@ void AddModbusRegisterDialog::on_btnOk_clicked() {
 }
 
 void AddModbusRegisterDialog::_setupUI() {
+  setAttribute(Qt::WA_DeleteOnClose);
+  _ui->setupUi(this);
+
   // TODO: check if it is edit or new
   setWindowTitle("New Register Window");
   _ui->inputCount->setValidator(new QIntValidator(0, 65535, this));
   _ui->inputAddress->setValidator(new QIntValidator(0, 65535, this));
+
+  _onInputChanged();
 }
 
 QPair<bool, QString> AddModbusRegisterDialog::_isInputValid() {
@@ -78,6 +81,11 @@ void AddModbusRegisterDialog::_onInputChanged() {
 
   qDebug() << maxCount;
   _ui->inputCount->setValidator(new QIntValidator(0, maxCount, this));
+
+  // calculate PLC address
+
+  const quint32 offsets[5] = {0, 100001, 1, 300001, 400001};
+  _ui->labelPlcAddress->setText(QString::number(offsets[type] + address));
 }
 
 void AddModbusRegisterDialog::on_selectType_currentIndexChanged(int index) {

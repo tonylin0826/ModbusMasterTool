@@ -7,6 +7,8 @@
 #include <QPoint>
 #include <typeinfo>
 
+#include "writemutipleregistersdialog.hpp"
+
 ModbusRegisterTableWidget::ModbusRegisterTableWidget(QWidget *parent) : QTableWidget(parent) { _setup(); }
 
 void ModbusRegisterTableWidget::updateValues(const QVector<QByteArray> &values) {
@@ -56,6 +58,14 @@ void ModbusRegisterTableWidget::setRegisterRange(quint16 address, quint16 count)
   }
 }
 
+QSize ModbusRegisterTableWidget::realSize() {
+  int w = verticalHeader()->width() + 8;                        // +4 seems to be needed
+  for (int i = 0; i < columnCount(); i++) w += columnWidth(i);  // seems to include gridline (on my machine)
+  int h = horizontalHeader()->height() * 2 + 8;
+  for (int i = 0; i < rowCount(); i++) h += rowHeight(i);
+  return QSize(w, h);
+}
+
 void ModbusRegisterTableWidget::_setup() {
   setContextMenuPolicy(Qt::CustomContextMenu);
   verticalHeader()->hide();
@@ -95,6 +105,12 @@ void ModbusRegisterTableWidget::_setup() {
   const auto actionDisplayHex = new ModbusDisplayAction(ModbusRegisterDisplayOption::HEX, tr("HEX"), this);
   const auto actionClose = new QAction(tr("Close"), this);
 
+  const auto writeFunctionMenu = new QMenu(tr("Write Functions"), this);
+  const auto actionWriteMultipleRegisters = new QAction(tr("Write Mutiple Registers"), this);
+  const auto actionWriteMultipleCoils = new QAction(tr("Write Mutiple Coils"), this);
+  writeFunctionMenu->addAction(actionWriteMultipleRegisters);
+  writeFunctionMenu->addAction(actionWriteMultipleCoils);
+
   display->addAction(actionDisplayUint);
   display->addAction(actionDisplayInt);
   display->addAction(actionDisplayUShort);
@@ -112,6 +128,7 @@ void ModbusRegisterTableWidget::_setup() {
   display->addAction(actionDisplayHex);
 
   _menu->addMenu(display);
+  _menu->addMenu(writeFunctionMenu);
   _menu->addAction(actionClose);
 
   QObject::connect(this, &QTableWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
@@ -124,6 +141,12 @@ void ModbusRegisterTableWidget::_setup() {
     qDebug() << (ac == actionClose);
 
     if (ac == actionClose) {
+      close();
+      return;
+    }
+
+    if (ac == actionWriteMultipleRegisters) {
+      emit writeMutipleRegisterActionClicked();
       return;
     }
 

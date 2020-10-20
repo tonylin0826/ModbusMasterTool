@@ -39,6 +39,8 @@ class ModbusSubWindow : public QMdiSubWindow {
 
   void registerClicked(QModbusDataUnit::RegisterType type, quint16 address);
 
+  void writeMutipleRegisterActionClicked();
+
  private:
   Ui::ModbusSubWindow *_ui;
 

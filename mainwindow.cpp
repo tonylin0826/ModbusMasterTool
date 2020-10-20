@@ -11,6 +11,7 @@
 #include "addmodbusregisterdialog.hpp"
 #include "modbussubwindow.hpp"
 #include "ui_mainwindow.h"
+#include "writemutipleregistersdialog.hpp"
 #include "writesinglecoildialog.hpp"
 #include "writesingleregisterdialog.hpp"
 
@@ -35,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
         _ui->btnConnect->setText("Connect");
         break;
       case QModbusDevice::State::ConnectingState:
+        _ui->btnConnect->setDisabled(false);
         _ui->labelConnectionStatus->setText("Connecting");
         _ui->btnConnect->setText("Disconnect");
         break;
@@ -86,6 +88,12 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
                                               dialog->exec();
                                               return;
                                             }
+                                          });
+
+                         QObject::connect(sub, &ModbusSubWindow::writeMutipleRegisterActionClicked, this,
+                                          [=]() -> void {
+                                            const auto dialog = new WriteMutipleRegistersDialog(this, 0);
+                                            dialog->exec();
                                           });
 
                          QObject::connect(sub, &ModbusSubWindow::closed, this,
@@ -187,6 +195,10 @@ void MainWindow::on_actiontest_triggered() {}
 void MainWindow::on_btnConnect_clicked() {
   if (_modbus->state() == QModbusClient::ConnectedState || _modbus->state() == QModbusClient::ConnectingState) {
     _modbus->disconnectDevice();
+    return;
+  }
+
+  if (_modbus->state() == QModbusClient::ClosingState) {
     return;
   }
 

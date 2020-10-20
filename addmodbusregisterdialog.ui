@@ -101,7 +101,14 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>PLC Address: 40001</string>
+        <string>PLC Address/Modicon Format: </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelPlcAddress">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

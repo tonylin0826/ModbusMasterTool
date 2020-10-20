@@ -34,6 +34,9 @@ ModbusSubWindow::ModbusSubWindow(QWidget *parent, ModbusSubWindowOptions options
 
     emit registerClicked(_options.type, _options.address + index.row());
   });
+
+  QObject::connect(_ui->tableWidget, &ModbusRegisterTableWidget::writeMutipleRegisterActionClicked, this,
+                   [=]() { emit writeMutipleRegisterActionClicked(); });
 }
 
 ModbusSubWindow::~ModbusSubWindow() { delete _ui; }
@@ -65,6 +68,7 @@ void ModbusSubWindow::_setupUi() {
   setWindowTitle(titles[_options.type]);
 
   _ui->tableWidget->setRegisterRange(_options.address, _options.count);
+  resize(_ui->tableWidget->realSize());
 }
 
 void ModbusSubWindow::closeEvent(QCloseEvent *closeEvent) {

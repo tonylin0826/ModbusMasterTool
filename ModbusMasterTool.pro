@@ -22,6 +22,7 @@ SOURCES += \
     mainwindow.cpp \
     modbusregistertablewidget.cpp \
     modbussubwindow.cpp \
+    writemutipleregistersdialog.cpp \
     writesinglecoildialog.cpp \
     writesingleregisterdialog.cpp
 
@@ -30,6 +31,7 @@ HEADERS += \
     mainwindow.hpp \
     modbusregistertablewidget.hpp \
     modbussubwindow.hpp \
+    writemutipleregistersdialog.hpp \
     writesinglecoildialog.hpp \
     writesingleregisterdialog.hpp
 
@@ -37,6 +39,7 @@ FORMS += \
     addmodbusregisterdialog.ui \
     mainwindow.ui \
     modbussubwindow.ui \
+    writemutipleregistersdialog.ui \
     writeregisterdialog.ui \
     writesinglecoildialog.ui \
     writesingleregisterdialog.ui
@@ -48,3 +51,9 @@ TRANSLATIONS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    style.qss
+
+RESOURCES += \
+    resource.qrc
