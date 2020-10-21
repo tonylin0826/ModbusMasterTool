@@ -21,6 +21,7 @@ SOURCES += \
     hexvalidator.cpp \
     main.cpp \
     mainwindow.cpp \
+    modbusconnectdialog.cpp \
     modbusregistertablewidget.cpp \
     modbussubwindow.cpp \
     writemultiplecoilsdialog.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     addmodbusregisterdialog.hpp \
     hexvalidator.hpp \
     mainwindow.hpp \
+    modbusconnectdialog.hpp \
     modbusregistertablewidget.hpp \
     modbussubwindow.hpp \
     writemultiplecoilsdialog.hpp \
@@ -42,6 +44,7 @@ HEADERS += \
 FORMS += \
     addmodbusregisterdialog.ui \
     mainwindow.ui \
+    modbusconnectdialog.ui \
     modbussubwindow.ui \
     writemultiplecoilsdialog.ui \
     writemutipleregistersdialog.ui \

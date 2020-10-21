@@ -9,6 +9,7 @@
 #include <QRegularExpression>
 
 #include "addmodbusregisterdialog.hpp"
+#include "modbusconnectdialog.hpp"
 #include "modbussubwindow.hpp"
 #include "ui_mainwindow.h"
 #include "writemultiplecoilsdialog.hpp"
@@ -68,51 +69,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
 
     QMenu contextMenu(tr("Context menu"), this);
     QAction action1("New register window", this);
-    QObject::connect(&action1, &QAction::triggered, this, [=]() {
-      const auto dialog = new AddModbusRegisterDialog(this);
-      QObject::connect(dialog, &AddModbusRegisterDialog::oked, this,
-                       [=](QModbusDataUnit::RegisterType type, quint16 address, quint16 count) {
-                         const auto sub = new ModbusSubWindow(this, {.type = type, .address = address, .count = count});
-
-                         QObject::connect(sub, &ModbusSubWindow::registerClicked, this,
-                                          [=](QModbusDataUnit::RegisterType type, quint16 address) -> void {
-                                            qDebug() << "register clicked" << type << address;
-
-                                            if (type == QModbusDataUnit::RegisterType::HoldingRegisters) {
-                                              const auto dialog = new WriteSingleRegisterDialog(this, address);
-                                              dialog->exec();
-                                              return;
-                                            }
-
-                                            if (type == QModbusDataUnit::RegisterType::Coils) {
-                                              const auto dialog = new WriteSingleCoilDialog(this, address);
-                                              dialog->exec();
-                                              return;
-                                            }
-                                          });
-
-                         QObject::connect(sub, &ModbusSubWindow::writeMutipleRegisterActionClicked, this,
-                                          [=]() -> void {
-                                            const auto dialog = new WriteMutipleRegistersDialog(this, 0);
-                                            dialog->exec();
-                                          });
-
-                         QObject::connect(sub, &ModbusSubWindow::writeMutipleCoilActionClicked, this, [=]() -> void {
-                           const auto dialog = new WriteMultipleCoilsDialog(this, 0);
-                           dialog->exec();
-                         });
-
-                         QObject::connect(sub, &ModbusSubWindow::closed, this,
-                                          [=](ModbusSubWindow *ptr) -> void { _subwindows.removeOne(ptr); });
-
-                         _ui->mdiArea->addSubWindow(sub);
-                         _subwindows.push_back(sub);
-
-                         sub->setGeometry(clickPos.x(), clickPos.y(), sub->width(), sub->height());
-                         sub->show();
-                       });
-      dialog->show();
-    });
+    QObject::connect(&action1, &QAction::triggered, this, [=]() { _showCreateNewRegisterWindow(clickPos); });
 
     contextMenu.addAction(&action1);
     contextMenu.exec(_ui->mdiArea->mapToGlobal(clickPos));
@@ -196,7 +153,50 @@ void MainWindow::_startPolling(int windowIndex) {
   });
 }
 
-void MainWindow::on_actiontest_triggered() {}
+void MainWindow::_showCreateNewRegisterWindow(const QPoint &clickPos) {
+  const auto dialog = new AddModbusRegisterDialog(this);
+  QObject::connect(dialog, &AddModbusRegisterDialog::oked, this,
+                   [=](QModbusDataUnit::RegisterType type, quint16 address, quint16 count) {
+                     const auto sub = new ModbusSubWindow(this, {.type = type, .address = address, .count = count});
+
+                     QObject::connect(sub, &ModbusSubWindow::registerClicked, this,
+                                      [=](QModbusDataUnit::RegisterType type, quint16 address) -> void {
+                                        qDebug() << "register clicked" << type << address;
+
+                                        if (type == QModbusDataUnit::RegisterType::HoldingRegisters) {
+                                          const auto dialog = new WriteSingleRegisterDialog(this, address);
+                                          dialog->exec();
+                                          return;
+                                        }
+
+                                        if (type == QModbusDataUnit::RegisterType::Coils) {
+                                          const auto dialog = new WriteSingleCoilDialog(this, address);
+                                          dialog->exec();
+                                          return;
+                                        }
+                                      });
+
+                     QObject::connect(sub, &ModbusSubWindow::writeMutipleRegisterActionClicked, this, [=]() -> void {
+                       const auto dialog = new WriteMutipleRegistersDialog(this, 0);
+                       dialog->exec();
+                     });
+
+                     QObject::connect(sub, &ModbusSubWindow::writeMutipleCoilActionClicked, this, [=]() -> void {
+                       const auto dialog = new WriteMultipleCoilsDialog(this, 0);
+                       dialog->exec();
+                     });
+
+                     QObject::connect(sub, &ModbusSubWindow::closed, this,
+                                      [=](ModbusSubWindow *ptr) -> void { _subwindows.removeOne(ptr); });
+
+                     _ui->mdiArea->addSubWindow(sub);
+                     _subwindows.push_back(sub);
+
+                     sub->setGeometry(clickPos.x(), clickPos.y(), sub->width(), sub->height());
+                     sub->show();
+                   });
+  dialog->show();
+}
 
 void MainWindow::on_btnConnect_clicked() {
   if (_modbus->state() == QModbusClient::ConnectedState || _modbus->state() == QModbusClient::ConnectingState) {
@@ -225,3 +225,12 @@ void MainWindow::on_btnConnect_clicked() {
 
   _modbus->connectDevice();
 }
+
+void MainWindow::on_actionConnect_triggered() {
+  const auto dialog = new ModbusConnectDialog(this);
+  dialog->exec();
+}
+
+void MainWindow::on_actionDisconnect_triggered() {}
+
+void MainWindow::on_actionNew_triggered() { _showCreateNewRegisterWindow(QPoint(0, 0)); }

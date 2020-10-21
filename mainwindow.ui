@@ -238,13 +238,31 @@
      <string>File</string>
     </property>
     <addaction name="separator"/>
-    <addaction name="actiontest"/>
+    <addaction name="actionNew"/>
+   </widget>
+   <widget class="QMenu" name="menuConnection">
+    <property name="title">
+     <string>Connection</string>
+    </property>
+    <addaction name="actionConnect"/>
+    <addaction name="actionDisconnect"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuConnection"/>
   </widget>
-  <action name="actiontest">
+  <action name="actionNew">
    <property name="text">
-    <string>test</string>
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionDisconnect">
+   <property name="text">
+    <string>Disconnect</string>
    </property>
   </action>
  </widget>

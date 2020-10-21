@@ -30,9 +30,13 @@ class MainWindow : public QMainWindow {
   bool eventFilter(QObject *object, QEvent *event) override;
 
  private slots:
-  void on_actiontest_triggered();
-
   void on_btnConnect_clicked();
+
+  void on_actionConnect_triggered();
+
+  void on_actionDisconnect_triggered();
+
+  void on_actionNew_triggered();
 
  private:
   Ui::MainWindow *_ui;
@@ -44,5 +48,7 @@ class MainWindow : public QMainWindow {
   void _setupUI();
 
   void _startPolling(int windowIndex = 0);
+
+  void _showCreateNewRegisterWindow(const QPoint &clickPos);
 };
 #endif  // MAINWINDOW_HPP
