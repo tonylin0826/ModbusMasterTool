@@ -83,7 +83,6 @@ void AddModbusRegisterDialog::_onInputChanged() {
   _ui->inputCount->setValidator(new QIntValidator(0, maxCount, this));
 
   // calculate PLC address
-
   const quint32 offsets[5] = {0, 100001, 1, 300001, 400001};
   _ui->labelPlcAddress->setText(QString::number(offsets[type] + address));
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>565</width>
-    <height>396</height>
+    <height>407</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,11 +40,34 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QGroupBox" name="groupSerial">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="title">
         <string>Serial Settings</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1">
+          <item>
+           <widget class="QComboBox" name="selectSerialDevice"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
           <item>
@@ -153,7 +176,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_3">
+      <widget class="QGroupBox" name="groupTcp">
        <property name="title">
         <string>Tcp/IP Settings</string>
        </property>

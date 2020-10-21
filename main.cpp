@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QSerialPortInfo>
 
 #include "mainwindow.hpp"
 
@@ -11,6 +12,11 @@ int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   qApp->setStyleSheet(qss.readAll());
   qss.close();
+
+  const auto ports = QSerialPortInfo::availablePorts();
+  for (const auto &port : ports) {
+    qDebug() << port.portName();
+  }
 
   MainWindow w;
   w.show();
