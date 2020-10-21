@@ -49,7 +49,37 @@ void ModbusConnectDialog::_updateDisabledArea() {
   ui->groupTcp->setDisabled(true);
 }
 
-void ModbusConnectDialog::_connectRtu() {}
+void ModbusConnectDialog::_connectRtu() {
+  const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
+  if (modbus->state() == QModbusClient::ConnectedState || modbus->state() == QModbusClient::ConnectingState) {
+    modbus->disconnectDevice();
+    return;
+  }
+
+  if (modbus->state() == QModbusClient::ClosingState) {
+    return;
+  }
+
+  ui->btnConnect->setDisabled(true);
+
+  const int databits[2] = {7, 8};
+  const int parities[2] = {2, 3};
+  const int stopbits[2] = {1, 2};
+  const int baudrates[8] = {1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200};
+
+  modbus->setConnectionParameter(QModbusDevice::SerialPortNameParameter, ui->selectSerialDevice->currentText());
+  modbus->setConnectionParameter(QModbusDevice::SerialParityParameter, parities[ui->selectParityBit->currentIndex()]);
+  modbus->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, baudrates[ui->selectBaudrate->currentIndex()]);
+  modbus->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, databits[ui->selectDataBit->currentIndex()]);
+  modbus->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, stopbits[ui->selectStopBit->currentIndex()]);
+
+  modbus->setTimeout(3000);
+  modbus->setNumberOfRetries(0);
+
+  modbus->connectDevice();
+
+  close();
+}
 
 void ModbusConnectDialog::_connectTcp() {
   const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
@@ -73,7 +103,7 @@ void ModbusConnectDialog::_connectTcp() {
   modbus->setConnectionParameter(QModbusDevice::NetworkPortParameter, QVariant(ui->inputPort->text().toUShort()));
   modbus->setConnectionParameter(QModbusDevice::NetworkAddressParameter, QVariant(ui->inputIpAddress->text()));
 
-  modbus->setTimeout(ui->inputTimout->text().toUInt());
+  modbus->setTimeout(3000);
   modbus->setNumberOfRetries(0);
 
   modbus->connectDevice();

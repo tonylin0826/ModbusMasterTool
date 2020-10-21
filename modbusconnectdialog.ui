@@ -72,9 +72,47 @@
          <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
           <item>
            <widget class="QComboBox" name="selectBaudrate">
+            <property name="currentIndex">
+             <number>3</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>1200</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>2400</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4800</string>
+             </property>
+            </item>
             <item>
              <property name="text">
               <string>9600</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>19200</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>38400</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>57600</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>115200</string>
              </property>
             </item>
            </widget>
@@ -100,7 +138,12 @@
            <widget class="QComboBox" name="selectDataBit">
             <item>
              <property name="text">
-              <string>8 Data bits</string>
+              <string>7 Data Bits</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>8 Data Bits</string>
              </property>
             </item>
            </widget>
@@ -129,6 +172,11 @@
               <string>Even Parity</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Odd Parity</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -152,7 +200,12 @@
            <widget class="QComboBox" name="selectStopBit">
             <item>
              <property name="text">
-              <string>1 Stop bit</string>
+              <string>1 Stop Bit</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>2 Stop Bits</string>
              </property>
             </item>
            </widget>
