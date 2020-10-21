@@ -41,6 +41,8 @@ class ModbusSubWindow : public QMdiSubWindow {
 
   void writeMutipleRegisterActionClicked();
 
+  void writeMutipleCoilActionClicked();
+
  private:
   Ui::ModbusSubWindow *_ui;
 

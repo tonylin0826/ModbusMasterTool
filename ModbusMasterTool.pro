@@ -18,19 +18,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     addmodbusregisterdialog.cpp \
+    hexvalidator.cpp \
     main.cpp \
     mainwindow.cpp \
     modbusregistertablewidget.cpp \
     modbussubwindow.cpp \
+    writemultiplecoilsdialog.cpp \
     writemutipleregistersdialog.cpp \
     writesinglecoildialog.cpp \
     writesingleregisterdialog.cpp
 
 HEADERS += \
     addmodbusregisterdialog.hpp \
+    hexvalidator.hpp \
     mainwindow.hpp \
     modbusregistertablewidget.hpp \
     modbussubwindow.hpp \
+    writemultiplecoilsdialog.hpp \
     writemutipleregistersdialog.hpp \
     writesinglecoildialog.hpp \
     writesingleregisterdialog.hpp
@@ -39,6 +43,7 @@ FORMS += \
     addmodbusregisterdialog.ui \
     mainwindow.ui \
     modbussubwindow.ui \
+    writemultiplecoilsdialog.ui \
     writemutipleregistersdialog.ui \
     writeregisterdialog.ui \
     writesinglecoildialog.ui \

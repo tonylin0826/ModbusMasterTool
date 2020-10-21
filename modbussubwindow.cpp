@@ -37,6 +37,9 @@ ModbusSubWindow::ModbusSubWindow(QWidget *parent, ModbusSubWindowOptions options
 
   QObject::connect(_ui->tableWidget, &ModbusRegisterTableWidget::writeMutipleRegisterActionClicked, this,
                    [=]() { emit writeMutipleRegisterActionClicked(); });
+
+  QObject::connect(_ui->tableWidget, &ModbusRegisterTableWidget::writeMutipleCoilActionClicked, this,
+                   [=]() { emit writeMutipleCoilActionClicked(); });
 }
 
 ModbusSubWindow::~ModbusSubWindow() { delete _ui; }
@@ -60,9 +63,9 @@ void ModbusSubWindow::updateValues(QVector<QByteArray> values) {
 void ModbusSubWindow::_setupUi() {
   setAttribute(Qt::WA_DeleteOnClose);
   setWindowFlags(Qt::SubWindow);
-
+  setWindowIcon(QIcon(QPixmap(1, 1)));
   _ui->setupUi(this);
-  setWidget(_ui->frame);
+  setWidget(_ui->tableWidget);
 
   const QString titles[5] = {"Invaid", "Discrete Inputs", "Coils", "Input Registers", "Holding Registers"};
   setWindowTitle(titles[_options.type]);

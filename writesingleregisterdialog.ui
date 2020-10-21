@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>305</width>
-    <height>150</height>
+    <height>151</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -97,9 +97,6 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QPushButton" name="btnSend">
-           <property name="styleSheet">
-            <string notr="true">colro: white</string>
-           </property>
            <property name="text">
             <string>Send</string>
            </property>

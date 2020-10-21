@@ -150,6 +150,11 @@ void ModbusRegisterTableWidget::_setup() {
       return;
     }
 
+    if (ac == actionWriteMultipleCoils) {
+      emit writeMutipleCoilActionClicked();
+      return;
+    }
+
     if (ac == actionDisplayUint || ac == actionDisplayInt || ac == actionDisplayUShort || ac == actionDisplayShort ||
         ac == actionDisplayIEEEFloat || ac == actionDisplayIEEEDouble || ac == actionDisplayHex ||
         ac == actionDisplayUintBE || ac == actionDisplayIntBE || ac == actionDisplayUShortBE ||

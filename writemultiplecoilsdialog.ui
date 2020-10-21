@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WriteMutipleRegistersDialog</class>
- <widget class="QDialog" name="WriteMutipleRegistersDialog">
+ <class>WriteMultipleCoilsDialog</class>
+ <widget class="QDialog" name="WriteMultipleCoilsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,10 +17,7 @@
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2,1">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
@@ -29,7 +26,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="inputSlaveId"/>
+        <widget class="QLineEdit" name="inputSlaveId">
+         <property name="text">
+          <string>1</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_2">
@@ -39,7 +43,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="inputAddress"/>
+        <widget class="QLineEdit" name="inputAddress">
+         <property name="text">
+          <string>1</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_3">
@@ -49,32 +60,13 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="inputCount"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLineEdit" name="inputCount">
          <property name="text">
-          <string>Format</string>
+          <string>1</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="selectFormat">
-         <item>
-          <property name="text">
-           <string>HEX</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Uint16</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Int16</string>
-          </property>
-         </item>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
         </widget>
        </item>
        <item>
@@ -93,12 +85,12 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QTableWidget" name="tableWidget">
          <column>
           <property name="text">
-           <string>Value</string>
+           <string>value</string>
           </property>
          </column>
         </widget>
@@ -106,7 +98,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QPushButton" name="btnSend">
          <property name="text">
@@ -122,19 +114,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_5">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>60</width>
-           <height>16777215</height>
-          </size>
-         </property>
+        <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Result:</string>
          </property>
@@ -142,11 +122,8 @@
        </item>
        <item>
         <widget class="QLabel" name="labelStatus">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+         <property name="enabled">
+          <bool>true</bool>
          </property>
          <property name="maximumSize">
           <size>

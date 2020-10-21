@@ -128,6 +128,8 @@ class ModbusRegisterTableWidget : public QTableWidget {
 
   void writeMutipleRegisterActionClicked();
 
+  void writeMutipleCoilActionClicked();
+
  private:
   QMenu *_menu;
 

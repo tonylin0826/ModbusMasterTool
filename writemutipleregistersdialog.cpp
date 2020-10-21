@@ -4,10 +4,11 @@
 #include <QModbusDataUnit>
 #include <QModbusReply>
 
+#include "hexvalidator.hpp"
 #include "ui_writemutipleregistersdialog.h"
 
 WriteMutipleRegistersDialog::WriteMutipleRegistersDialog(MainWindow *parent, quint16 startingAddress)
-    : QDialog(parent), ui(new Ui::WriteMutipleRegistersDialog) {
+    : QDialog(parent), ui(new Ui::WriteMutipleRegistersDialog), _format(Hex) {
   _setupUI(startingAddress);
 }
 
@@ -28,23 +29,69 @@ void WriteMutipleRegistersDialog::_setupUI(quint16 startingAddress) {
   ui->inputCount->setValidator(new QIntValidator(1, 123, this));
   ui->inputCount->setFocus();
 
+  _updateTableSettings();
+}
+
+void WriteMutipleRegistersDialog::_updateTableSettings() {
   ui->tableWidget->setRowCount(ui->inputCount->text().toUInt());
 
-  for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
-    QLineEdit *edit = new QLineEdit();
-    edit->setText("0");
-    edit->setAlignment(Qt::AlignRight);
-    edit->setValidator(new QIntValidator(0, 65535, this));
-    ui->tableWidget->setCellWidget(i, 0, edit);
+  switch (_format) {
+    case WriteFormat::Hex:
+      for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+        QLineEdit *edit = new QLineEdit();
+        edit->setText("0000");
+        edit->setAlignment(Qt::AlignRight);
+        edit->setInputMask("HHHH");
+        ui->tableWidget->setCellWidget(i, 0, edit);
+      }
+      break;
+    case WriteFormat::Int16:
+      for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+        QLineEdit *edit = new QLineEdit();
+        edit->setText("0");
+        edit->setAlignment(Qt::AlignRight);
+        edit->setValidator(new QIntValidator(-32768, 32767, this));
+        ui->tableWidget->setCellWidget(i, 0, edit);
+      }
+      break;
+    case WriteFormat::Uint16:
+    default:
+      for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+        QLineEdit *edit = new QLineEdit();
+        edit->setText("0");
+        edit->setAlignment(Qt::AlignRight);
+        edit->setValidator(new QIntValidator(0, 65535, this));
+        ui->tableWidget->setCellWidget(i, 0, edit);
+      }
+      break;
   }
 }
 
 QVector<quint16> WriteMutipleRegistersDialog::_getValues() {
   QVector<quint16> r;
 
-  for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
-    const auto text = qobject_cast<QLineEdit *>(ui->tableWidget->cellWidget(i, 0))->text();
-    r.push_back(text.isEmpty() ? 0 : text.toUShort());
+  switch (_format) {
+    case WriteFormat::Hex:
+      for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+        const auto text = qobject_cast<QLineEdit *>(ui->tableWidget->cellWidget(i, 0))->text();
+        bool ok = false;
+        quint16 value = text.toUShort(&ok, 16);
+        r.push_back(text.isEmpty() ? 0 : (ok ? value : 0));
+      }
+      break;
+    case WriteFormat::Int16:
+      for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+        const auto text = qobject_cast<QLineEdit *>(ui->tableWidget->cellWidget(i, 0))->text();
+        r.push_back(text.isEmpty() ? 0 : text.toShort());
+      }
+      break;
+    case WriteFormat::Uint16:
+    default:
+      for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+        const auto text = qobject_cast<QLineEdit *>(ui->tableWidget->cellWidget(i, 0))->text();
+        r.push_back(text.isEmpty() ? 0 : text.toUShort());
+      }
+      break;
   }
 
   return r;
@@ -93,14 +140,9 @@ void WriteMutipleRegistersDialog::on_btnSend_clicked() {
 
 void WriteMutipleRegistersDialog::on_btnCancel_clicked() { close(); }
 
-void WriteMutipleRegistersDialog::on_inputCount_editingFinished() {
-  ui->tableWidget->setRowCount(ui->inputCount->text().toUInt());
+void WriteMutipleRegistersDialog::on_inputCount_editingFinished() { _updateTableSettings(); }
 
-  for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
-    QLineEdit *edit = new QLineEdit();
-    edit->setText("0");
-    edit->setAlignment(Qt::AlignRight);
-    edit->setValidator(new QIntValidator(0, 65535, this));
-    ui->tableWidget->setCellWidget(i, 0, edit);
-  }
+void WriteMutipleRegistersDialog::on_selectFormat_currentIndexChanged(int index) {
+  _format = static_cast<WriteFormat>(index);
+  _updateTableSettings();
 }

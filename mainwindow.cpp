@@ -11,6 +11,7 @@
 #include "addmodbusregisterdialog.hpp"
 #include "modbussubwindow.hpp"
 #include "ui_mainwindow.h"
+#include "writemultiplecoilsdialog.hpp"
 #include "writemutipleregistersdialog.hpp"
 #include "writesinglecoildialog.hpp"
 #include "writesingleregisterdialog.hpp"
@@ -95,6 +96,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
                                             const auto dialog = new WriteMutipleRegistersDialog(this, 0);
                                             dialog->exec();
                                           });
+
+                         QObject::connect(sub, &ModbusSubWindow::writeMutipleCoilActionClicked, this, [=]() -> void {
+                           const auto dialog = new WriteMultipleCoilsDialog(this, 0);
+                           dialog->exec();
+                         });
 
                          QObject::connect(sub, &ModbusSubWindow::closed, this,
                                           [=](ModbusSubWindow *ptr) -> void { _subwindows.removeOne(ptr); });

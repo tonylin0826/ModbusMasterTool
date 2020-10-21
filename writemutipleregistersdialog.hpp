@@ -9,7 +9,7 @@ namespace Ui {
 class WriteMutipleRegistersDialog;
 }
 
-enum WriteFormat { Hex = 0 };
+enum WriteFormat { Hex = 0, Uint16, Int16 };
 
 class WriteMutipleRegistersDialog : public QDialog {
   Q_OBJECT
@@ -26,12 +26,18 @@ class WriteMutipleRegistersDialog : public QDialog {
 
   void on_inputCount_editingFinished();
 
- private:
+  void on_selectFormat_currentIndexChanged(int index);
+
+private:
   Ui::WriteMutipleRegistersDialog *ui;
 
   void _setupUI(quint16 startingAddress);
 
+  void _updateTableSettings();
+
   QVector<quint16> _getValues();
+
+  WriteFormat _format;
 };
 
 #endif  // WRITEMUTIPLEREGISTERSDIALOG_HPP
