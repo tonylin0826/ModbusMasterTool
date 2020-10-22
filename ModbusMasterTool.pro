@@ -48,7 +48,6 @@ FORMS += \
     modbussubwindow.ui \
     writemultiplecoilsdialog.ui \
     writemutipleregistersdialog.ui \
-    writeregisterdialog.ui \
     writesinglecoildialog.ui \
     writesingleregisterdialog.ui
 

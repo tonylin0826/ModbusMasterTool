@@ -30,8 +30,6 @@ class MainWindow : public QMainWindow {
   bool eventFilter(QObject *object, QEvent *event) override;
 
  private slots:
-  void on_btnConnect_clicked();
-
   void on_actionConnect_triggered();
 
   void on_actionDisconnect_triggered();
@@ -50,5 +48,7 @@ class MainWindow : public QMainWindow {
   void _startPolling(int windowIndex = 0);
 
   void _showCreateNewRegisterWindow(const QPoint &clickPos);
+
+  void _updateConnectionState(int state);
 };
 #endif  // MAINWINDOW_HPP

@@ -58,6 +58,12 @@ void WriteMultipleCoilsDialog::on_btnSend_clicked() {
   const auto slaveId = ui->inputSlaveId->text().toUShort();
   const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
 
+  if (!modbus) {
+    ui->labelStatus->setText("Failed - Modbus not connected");
+    ui->labelStatus->setStyleSheet("QLabel { color : Crimson; }");
+    return;
+  }
+
   const auto reply = modbus->sendWriteRequest(QModbusDataUnit(QModbusDataUnit::Coils, address, _getValues()), slaveId);
 
   if (!reply) {

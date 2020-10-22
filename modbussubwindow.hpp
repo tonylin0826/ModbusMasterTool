@@ -11,6 +11,7 @@ class ModbusSubWindow;
 
 typedef struct {
   QModbusDataUnit::RegisterType type;
+  quint8 slaveId;
   quint16 address;
   quint16 count;
 } ModbusSubWindowOptions;
@@ -24,7 +25,7 @@ class ModbusSubWindow : public QMdiSubWindow {
 
   ModbusSubWindow(QWidget *parent = nullptr,
                   ModbusSubWindowOptions options = {
-                      .type = QModbusDataUnit::RegisterType::Coils, .address = 0, .count = 10});
+                      .type = QModbusDataUnit::RegisterType::Coils, .slaveId = 1, .address = 0, .count = 10});
 
   ~ModbusSubWindow();
 

@@ -37,7 +37,7 @@ class AddModbusRegisterDialog : public QDialog {
   void _onInputChanged();
 
  signals:
-  void oked(QModbusDataUnit::RegisterType type, quint16 address, quint16 count);
+  void oked(QModbusDataUnit::RegisterType type, quint16 address, quint16 count, quint8 slaveId);
   void canceled();
 };
 

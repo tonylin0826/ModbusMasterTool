@@ -18,37 +18,8 @@
 #include "writesingleregisterdialog.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), _ui(new Ui::MainWindow), _modbus(new QModbusTcpClient(this)), _pollTimer(new QTimer(this)) {
+    : QMainWindow(parent), _ui(new Ui::MainWindow), _modbus(nullptr), _pollTimer(new QTimer(this)) {
   _setupUI();
-
-  QObject::connect(_modbus, &QModbusClient::errorOccurred, this,
-                   [=](QModbusDevice::Error e) { qDebug() << e << _modbus->errorString(); });
-
-  QObject::connect(_modbus, &QModbusClient::stateChanged, [=](int state) {
-    qDebug() << "state" << state;
-    switch (state) {
-      case QModbusDevice::State::ConnectedState:
-        _ui->btnConnect->setDisabled(false);
-        _ui->labelConnectionStatus->setText("Connected");
-        _ui->btnConnect->setText("Disconnect");
-        break;
-      case QModbusDevice::State::UnconnectedState:
-        _ui->btnConnect->setDisabled(false);
-        _ui->labelConnectionStatus->setText("Disconnected");
-        _ui->btnConnect->setText("Connect");
-        break;
-      case QModbusDevice::State::ConnectingState:
-        _ui->btnConnect->setDisabled(false);
-        _ui->labelConnectionStatus->setText("Connecting");
-        _ui->btnConnect->setText("Disconnect");
-        break;
-      default:
-        _ui->btnConnect->setDisabled(false);
-        _ui->labelConnectionStatus->setText("Disconnected");
-        _ui->btnConnect->setText("Connect");
-        break;
-    }
-  });
 
   _startPolling();
 }
@@ -82,15 +53,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
 void MainWindow::_setupUI() {
   _ui->setupUi(this);
 
-  _ui->inputPort->setText("502");
-  _ui->inputPort->setValidator(new QIntValidator(0, 65535, this));
-
-  QString IpRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-  QRegularExpression IpRegex("^" + IpRange + "(\\." + IpRange + ")" + "(\\." + IpRange + ")" + "(\\." + IpRange + ")$");
-
-  _ui->inputIp->setText("0.0.0.0");
-  _ui->inputIp->setText("10.211.55.3");
-  //  _ui->inputPort->setValidator(new QRegularExpressionValidator(IpRegex, this));
+  _updateConnectionState(QModbusDevice::State::UnconnectedState);
 
   _ui->mdiArea->installEventFilter(this);
   _ui->mdiArea->setBackground(QBrush(QColor(60, 63, 65)));
@@ -100,6 +63,12 @@ void MainWindow::_setupUI() {
 void MainWindow::_startPolling(int windowIndex) {
   const auto nextRound = [=]() { QTimer::singleShot(1000, this, [=]() { _startPolling(0); }); };
   const auto nextWindow = [=]() { QTimer::singleShot(0, this, [=]() { _startPolling(windowIndex + 1); }); };
+
+  if (_modbus == nullptr) {
+    qWarning() << "_startPolling modbus not ready";
+    nextRound();
+    return;
+  }
 
   if (_modbus->state() != QModbusClient::State::ConnectedState) {
     qWarning() << "_startPolling not connected";
@@ -115,7 +84,8 @@ void MainWindow::_startPolling(int windowIndex) {
 
   const auto options = _subwindows[windowIndex]->options();
 
-  const auto reply = _modbus->sendReadRequest(QModbusDataUnit(options.type, options.address, options.count), 1);
+  const auto reply =
+      _modbus->sendReadRequest(QModbusDataUnit(options.type, options.address, options.count), options.slaveId);
   if (!reply) {
     qWarning() << windowIndex << "read" << options.type << "failed";
     nextWindow();
@@ -156,8 +126,9 @@ void MainWindow::_startPolling(int windowIndex) {
 void MainWindow::_showCreateNewRegisterWindow(const QPoint &clickPos) {
   const auto dialog = new AddModbusRegisterDialog(this);
   QObject::connect(dialog, &AddModbusRegisterDialog::oked, this,
-                   [=](QModbusDataUnit::RegisterType type, quint16 address, quint16 count) {
-                     const auto sub = new ModbusSubWindow(this, {.type = type, .address = address, .count = count});
+                   [=](QModbusDataUnit::RegisterType type, quint16 address, quint16 count, quint8 slaveId) {
+                     const auto sub = new ModbusSubWindow(
+                         this, {.type = type, .slaveId = slaveId, .address = address, .count = count});
 
                      QObject::connect(sub, &ModbusSubWindow::registerClicked, this,
                                       [=](QModbusDataUnit::RegisterType type, quint16 address) -> void {
@@ -198,39 +169,54 @@ void MainWindow::_showCreateNewRegisterWindow(const QPoint &clickPos) {
   dialog->show();
 }
 
-void MainWindow::on_btnConnect_clicked() {
-  if (_modbus->state() == QModbusClient::ConnectedState || _modbus->state() == QModbusClient::ConnectingState) {
-    _modbus->disconnectDevice();
-    return;
+void MainWindow::_updateConnectionState(int state) {
+  qDebug() << "state" << state;
+  switch (state) {
+    case QModbusDevice::State::ConnectedState:
+      _ui->labelConnectionStatus->setText("Connected");
+      _ui->actionConnect->setDisabled(true);
+      _ui->actionDisconnect->setDisabled(false);
+      break;
+    case QModbusDevice::State::UnconnectedState:
+      _ui->labelConnectionStatus->setText("Disconnected");
+      _ui->actionConnect->setDisabled(false);
+      _ui->actionDisconnect->setDisabled(true);
+      break;
+    case QModbusDevice::State::ConnectingState:
+      _ui->labelConnectionStatus->setText("Connecting");
+      _ui->actionConnect->setDisabled(true);
+      _ui->actionDisconnect->setDisabled(false);
+      break;
+    default:
+      _ui->labelConnectionStatus->setText("Disconnected");
+      _ui->actionConnect->setDisabled(false);
+      _ui->actionDisconnect->setDisabled(true);
+      break;
   }
-
-  if (_modbus->state() == QModbusClient::ClosingState) {
-    return;
-  }
-
-  qDebug() << _ui->inputPort->hasAcceptableInput() << " " << _ui->inputIp->hasAcceptableInput();
-  if (!_ui->inputPort->hasAcceptableInput() || !_ui->inputIp->hasAcceptableInput()) {
-    // TODO: show error message
-    qWarning() << "invalid input";
-    return;
-  }
-
-  _ui->btnConnect->setDisabled(true);
-
-  _modbus->setConnectionParameter(QModbusDevice::NetworkPortParameter, QVariant(_ui->inputPort->text().toUShort()));
-  _modbus->setConnectionParameter(QModbusDevice::NetworkAddressParameter, QVariant(_ui->inputIp->text()));
-
-  _modbus->setTimeout(100);
-  _modbus->setNumberOfRetries(0);
-
-  _modbus->connectDevice();
 }
 
 void MainWindow::on_actionConnect_triggered() {
   const auto dialog = new ModbusConnectDialog(this);
+  QObject::connect(dialog, &ModbusConnectDialog::modbusDeviceGenerated, this, [=](QModbusClient *modbus) {
+    _modbus = modbus;
+
+    QObject::connect(_modbus, &QModbusClient::errorOccurred, this,
+                     [=](QModbusDevice::Error e) { qDebug() << e << _modbus->errorString(); });
+
+    QObject::connect(_modbus, &QModbusClient::stateChanged, this, &MainWindow::_updateConnectionState);
+  });
   dialog->exec();
 }
 
-void MainWindow::on_actionDisconnect_triggered() {}
+void MainWindow::on_actionDisconnect_triggered() {
+  if (!_modbus) {
+    return;
+  }
+
+  _modbus->disconnectDevice();
+
+  delete _modbus;
+  _modbus = nullptr;
+}
 
 void MainWindow::on_actionNew_triggered() { _showCreateNewRegisterWindow(QPoint(0, 0)); }

@@ -1,6 +1,8 @@
 #include "modbusconnectdialog.hpp"
 
 #include <QDebug>
+#include <QModbusRtuSerialMaster>
+#include <QModbusTcpClient>
 #include <QSerialPortInfo>
 
 #include "ui_modbusconnectdialog.h"
@@ -50,20 +52,14 @@ void ModbusConnectDialog::_updateDisabledArea() {
 }
 
 void ModbusConnectDialog::_connectRtu() {
-  const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
-  if (modbus->state() == QModbusClient::ConnectedState || modbus->state() == QModbusClient::ConnectingState) {
-    modbus->disconnectDevice();
-    return;
-  }
+  const auto modbus = new QModbusRtuSerialMaster(parentWidget());
 
-  if (modbus->state() == QModbusClient::ClosingState) {
-    return;
-  }
+  emit modbusDeviceGenerated(modbus);
 
   ui->btnConnect->setDisabled(true);
 
   const int databits[2] = {7, 8};
-  const int parities[2] = {2, 3};
+  const int parities[3] = {0, 2, 3};
   const int stopbits[2] = {1, 2};
   const int baudrates[8] = {1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200};
 
@@ -82,15 +78,9 @@ void ModbusConnectDialog::_connectRtu() {
 }
 
 void ModbusConnectDialog::_connectTcp() {
-  const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
-  if (modbus->state() == QModbusClient::ConnectedState || modbus->state() == QModbusClient::ConnectingState) {
-    modbus->disconnectDevice();
-    return;
-  }
+  const auto modbus = new QModbusTcpClient(parentWidget());
 
-  if (modbus->state() == QModbusClient::ClosingState) {
-    return;
-  }
+  emit modbusDeviceGenerated(modbus);
 
   if (!ui->inputPort->hasAcceptableInput() || !ui->inputIpAddress->hasAcceptableInput()) {
     // TODO: show error message

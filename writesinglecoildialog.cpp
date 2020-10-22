@@ -24,6 +24,12 @@ void WriteSingleCoilDialog::on_btnSend_clicked() {
   const auto on = _onOffGroup->checkedId() == 1;
   const auto modbus = qobject_cast<MainWindow *>(parentWidget())->modbus();
 
+  if (!modbus) {
+    _ui->labelStatus->setText("Failed - Modbus not connected");
+    _ui->labelStatus->setStyleSheet("QLabel { color : Crimson; }");
+    return;
+  }
+
   const auto reply = modbus->sendWriteRequest(
       QModbusDataUnit(QModbusDataUnit::RegisterType::Coils, address, QVector<quint16>({on})), slaveId);
 

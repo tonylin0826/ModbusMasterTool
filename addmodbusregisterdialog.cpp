@@ -33,8 +33,9 @@ void AddModbusRegisterDialog::on_btnOk_clicked() {
 
   const quint16 count = _ui->inputCount->text().toUInt();
   const quint16 address = _ui->inputAddress->text().toUInt();
+  const quint8 slaveId = _ui->inputSlaveId->text().toUInt();
 
-  emit oked(static_cast<QModbusDataUnit::RegisterType>(_ui->selectType->currentIndex() + 1), address, count);
+  emit oked(static_cast<QModbusDataUnit::RegisterType>(_ui->selectType->currentIndex() + 1), address, count, slaveId);
   close();
 }
 
@@ -46,6 +47,7 @@ void AddModbusRegisterDialog::_setupUI() {
   setWindowTitle("New Register Window");
   _ui->inputCount->setValidator(new QIntValidator(0, 65535, this));
   _ui->inputAddress->setValidator(new QIntValidator(0, 65535, this));
+  _ui->inputSlaveId->setValidator(new QIntValidator(0, 255, this));
 
   _onInputChanged();
 }

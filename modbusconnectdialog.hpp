@@ -16,6 +16,9 @@ class ModbusConnectDialog : public QDialog {
 
   ~ModbusConnectDialog();
 
+ signals:
+  void modbusDeviceGenerated(QModbusClient *modus);
+
  private slots:
   void on_btnConnect_clicked();
 
